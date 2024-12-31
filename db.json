@@ -1,0 +1,69 @@
+{
+  "clientes": [
+    {
+      "id": "cbe6",
+      "nombre": "José Lopez",
+      "password": "12345678",
+      "confirm_password": "12345678",
+      "email": "jose@gmail.com",
+      "rol": "Tecnico",
+      "estado": true
+    },
+    {
+      "id": "5c95",
+      "nombre": "pepe",
+      "password": "12345678",
+      "confirm_password": "12345678",
+      "email": "pepe@gmail.com",
+      "rol": "Relevador",
+      "estado": 1
+    },
+    {
+      "id": "98a9",
+      "nombre": "Marcos Pe",
+      "password": "12345678",
+      "confirm_password": "12345678",
+      "email": "pepe@gmail.com",
+      "rol": "Relevador",
+      "estado": 1
+    }
+  ],
+  "relevamientos": [
+    {
+      "id": "126c",
+      "especie": "Roble",
+      "altura": "15 metros",
+      "diametro": "30 cm",
+      "estadoSanitario": "Bueno",
+      "ubicacion": "Parque Central",
+      "observaciones": "Árbol saludable con buena cobertura foliar"
+    },
+    {
+      "id": "126d",
+      "especie": "Pino",
+      "altura": "20 metros",
+      "diametro": "40 cm",
+      "estadoSanitario": "Regular",
+      "ubicacion": "Bosque Municipal",
+      "observaciones": "Algunos daños por plagas en la corteza"
+    },
+    {
+      "id": "126e",
+      "especie": "Abeto",
+      "altura": "12 metros",
+      "diametro": "35 cm",
+      "estadoSanitario": "Excelente",
+      "ubicacion": "Jardín Botánico",
+      "observaciones": "Árbol robusto, sin signos de enfermedades"
+    },
+    {
+      "id": "126f",
+      "especie": "Sauce",
+      "altura": "10 metros",
+      "diametro": "25 cm",
+      "estadoSanitario": "Bueno",
+      "ubicacion": "Ribera del río",
+      "observaciones": "Crecimiento saludable, adecuado para su entorno"
+    }
+  ]
+}
