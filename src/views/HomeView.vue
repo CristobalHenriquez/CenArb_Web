@@ -160,7 +160,9 @@ onMounted(() => {
     <Carousel 
       :items="locations" 
       bgColor="#26473c" 
+      hvColor="white"
       txColor="#92a29d"
+      hvTxColor="#26473c"
       txAlign="start" 
     />
 
@@ -168,7 +170,9 @@ onMounted(() => {
     <Carousel 
       :items="locations" 
       bgColor="#aea646"
+      hvColor="white"
       txColor="#6b6951"
+      hvTxColor="#aea646"
       txAlign="end"
     />
   </div>
@@ -190,14 +194,8 @@ onMounted(() => {
   </div>
 
   <!-- Sección de imágenes -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:flex xl:flex-wrap justify-items-center items-center gap-8">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:-mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:-mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:-mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
-    <img class="w-20 sm:w-24 md:w-28 lg:w-28 xl:w-28 xl:mt-4 mx-auto" src="../components/icons/AppArbolado.svg" alt="">
+  <div class="items-center">
+    <img class="w-3/4 xl:mt-4 mx-auto" src="../components/icons/GrupoCelulares.svg" alt="">
   </div>
 </div>
 

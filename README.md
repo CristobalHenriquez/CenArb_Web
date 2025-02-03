@@ -44,14 +44,32 @@ npm run build
 
 ### Flujo de Trabajo
 
-#### 1. Trabajar en la Rama `develop`
+#### 1. Crear y Configurar la Rama `develop`
 
-1. Cambia a la rama `develop`:
+Si aún no tienes la rama `develop`, sigue estos pasos:
+1. Cambia a la rama principal (`main`):
+   ```sh
+   git checkout main
+   ```
+
+2. Crea la rama `develop`:
+   ```sh
+   git checkout -b develop
+   ```
+
+3. Sube la rama al repositorio remoto:
+   ```sh
+   git push -u origin develop
+   ```
+
+#### 2. Trabajar en la Rama `develop`
+
+1. Asegúrate de estar en la rama `develop`:
    ```sh
    git checkout develop
    ```
 
-2. Antes de realizar cambios, asegúrate de tener la última versión del código:
+2. Antes de realizar cambios, sincroniza tu rama local con el remoto:
    ```sh
    git pull origin develop
    ```
@@ -76,14 +94,19 @@ npm run build
    git push origin develop
    ```
 
-#### 2. Sincronización Regular
+#### 3. Sincronización Regular
 Es importante que sincronices frecuentemente tu rama local con el remoto para evitar conflictos:
    ```sh
    git pull origin develop
    ```
 
-#### 3. Fusionar Cambios en `main`
-Solo el líder del proyecto o una persona designada fusionará los cambios desde `develop` a `main` una vez que estén probados y listos para producción.
+#### 4. Fusionar Cambios en `main`
+Solo el líder del proyecto o una persona designada fusionará los cambios desde `develop` a `main` una vez que estén probados y listos para producción:
+   ```sh
+   git checkout main
+   git merge develop
+   git push origin main
+   ```
 
 ### Recomendaciones
 
