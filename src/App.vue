@@ -39,13 +39,13 @@
 
   </header>
 
-  <main :class="route.name === 'home' || route.name === 'municipio' ? '' : 'max-w-6xl mx-auto mt-10'">
+  <main :class="route.name === 'home' || route.name === 'municipio' || route.name === 'login' ? '' : 'max-w-6xl mx-auto mt-10'">
     <RouterView />
   </main>
-  <footer class="bg-neutral-700 flex justify-between items-center px-8 h-24 w-full">
+  <footer class="bg-neutral-700 flex flex-col justify-center py-4 md:flex-row md:justify-between items-center md:px-8 md:py-0 md:h-24 w-full">
   <!-- Contenedor de las dos imágenes de la izquierda con espacio entre ellas -->
-  <div class="flex flex-col items-start space-y-4">
-  <p class="text-white text-base font-semibold tracking-wide hover:text-gray-300 transition duration-300">
+  <div class="flex flex-col items-center pb-8 md:pb-0 md:items-start space-y-4">
+  <p class="text-white text-sm md:text-base font-semibold tracking-wide hover:text-gray-300 transition duration-300">
     COMPROMETIDOS CON LA ACCIÓN CLIMÁTICA
   </p>
   <div class="flex space-x-4">
@@ -65,7 +65,7 @@
 </div>
 
   <!-- Contenedor para las imágenes a la derecha -->
-  <div class="flex gap-4 ml-auto">
+  <div class="flex gap-4 md:ml-auto">
     <img src="./components/icons/RAMCC logo blanco.png" alt="Imagen 1" class="w-29 h-8" />
     <img src="./components/icons/Fes.svg" alt="Imagen 2" class="w-29 h-8" />
   </div>
