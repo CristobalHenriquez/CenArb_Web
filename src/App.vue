@@ -16,7 +16,7 @@
    
     <div class="header-content">
       <RouterLink 
-    to="logout" 
+    to="/" 
     class="block rounded-full bg-red-700 hover:bg-red-500 py-2 px-3 text-white text-center uppercase font-bold shadow text-sm">
     Salir
       </RouterLink>
