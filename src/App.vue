@@ -6,19 +6,29 @@
 
 <template>
   <header class="bg-[rgb(75,101,98)] flex justify-between items-center px-5 py-5">
-    <!-- Imagen a la izquierda -->
-    <div class="flex-shrink-0 mr-8">
-      <img src="./components/icons/AppArbolado2.png" alt="Imagen Centro" class="h-12 mx-auto">
-    </div>
+    <!-- Imagen a la izquierda con enlace al Home -->
+  <div class="flex-shrink-0 mr-8">
+    <RouterLink to="/">
+      <img src="./components/icons/AppArbolado2.png" alt="Imagen Centro" class="h-12 mx-auto cursor-pointer">
+    </RouterLink>
+  </div>
     
     
 
    
     <div class="header-content">
-      <!-- Botón "Salir" solo si la ruta actual NO es 'home' ni 'login' -->
+      <!-- Si la ruta es 'home', mostrar 'Login' -->
       <RouterLink 
-        v-if="route.name !== 'home' && route.name !== 'login'"
-        to="/" 
+        v-if="route.name === 'home'"
+        to="/login"
+        class="block rounded-full bg-blue-700 hover:bg-blue-500 py-2 px-3 text-white text-center uppercase font-bold shadow text-sm">
+        ENTRAR
+      </RouterLink>
+
+      <!-- Si la ruta es 'login', NO mostrar el botón -->
+      <RouterLink 
+        v-else-if="route.name !== 'login'"
+        to="/"
         class="block rounded-full bg-red-700 hover:bg-red-500 py-2 px-3 text-white text-center uppercase font-bold shadow text-sm">
         Salir
       </RouterLink>
