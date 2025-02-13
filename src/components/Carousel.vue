@@ -8,6 +8,7 @@ defineProps({
   txColor: { type: String, default: '#91a19c' },
   hvTxColor: { type: String, default: '#3c6354' },
   txAlign: { type: String, default: 'center' },
+  color: { type: String, default: 'white' },
   pL: { type: String, default: 'p-0' },
   pR: { type: String, default: 'p-0' }
 });
@@ -71,7 +72,7 @@ const handleMouseLeave = () => {
       @mouseenter="handleMouseEnter(index)"
       @mouseleave="handleMouseLeave"
       >
-        <h5 class="text-white text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.length }}</h5>
+        <h5 class="text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.length }}</h5>
         <h4 class="text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.name }}</h4>
         <h3 class="text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.prov }}</h3>
       </div>

@@ -178,25 +178,31 @@ onMounted(() => {
   </div>
 
   <div class="h-auto md:h-3/4 flex flex-col md:flex-row p-6 md:p-10 justify-evenly items-center">
-    <p class="text-base sm:text-lg md:text-xl xl:text-3xl md:w-3/5 xl:w-1/2 md:pr-8">
+    <p class="text-xl md:text-2xl xl:text-3xl md:w-3/5 xl:w-1/2 md:pr-8">
       Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officiis alias sint odit ipsum ullam fugit error, necessitatibus, quas sequi veritatis voluptatum doloremque atque quasi. Omnis reiciendis neque ducimus suscipit quam!
     </p>
-    <img class="w-full md:w-2/5 xl:w-1/4 h-auto md:h-full object-cover rounded-2xl" src="/src/assets/img/smartphone.jpeg" alt="Smartphone">
+    <img class="mt-5 md:mt-0 w-full md:w-1/3 xl:w-1/4 h-auto md:h-full object-cover rounded-2xl" src="/src/assets/img/smartphone.jpeg" alt="Smartphone">
   </div>
 
 
-  <div id="fondo" class="w-full py-36 flex flex-col justify-evenly bg-[#042825]">
-  <!-- Sección de texto -->
+ <div id="fondo" class="w-full py-36 flex flex-col justify-evenly bg-[#042825]">
   <div class="mb-20">
-    <p class="text-center text-3xl text-white px-8 sm:px-20">
+    <p class="text-center text-xl md:text-2xl xl:text-3xl text-white px-8 sm:px-20">
       Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad cumque aliquam excepturi temporibus, a repellendus quae labore. Hic, doloremque provident rem, quod accusamus accusantium eligendi ratione ullam ex repellat officiis?
     </p>
   </div>
+  <div class="flex flex-wrap justify-evenly items-center px-2 md:px-5 xl:px-44">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu1.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu2.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu3.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu4.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu5.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu6.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu7.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu8.svg" alt="">
+  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu9.svg" alt="">
+</div>
 
-  <!-- Sección de imágenes -->
-  <div class="items-center">
-    <img class="w-3/4 xl:mt-4 mx-auto" src="../components/icons/GrupoCelulares.svg" alt="">
-  </div>
 </div>
 
 

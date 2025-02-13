@@ -8,7 +8,7 @@ const props = defineProps({
   center: {
     type: Object,
     required: true,
-  },  
+  },
   zoom: {
     type: Number,
     required: true,
@@ -22,6 +22,7 @@ const props = defineProps({
 const mapElement = ref(null);
 const map = ref(null);
 const route = useRoute();
+let currentAlertContainer = null; 
 
 onMounted(() => {
   loadGoogleMaps();
@@ -51,7 +52,6 @@ function initMap() {
 
 function updateMarkers() {
   if (map.value) {
-
     const markers = props.locations.map((location) => {
       const marker = new google.maps.Marker({
         position: { lat: location.lat, lng: location.lng },
@@ -74,9 +74,15 @@ function updateMarkers() {
   }
 }
 
-// Función para mostrar el alert
+// Mostrar el alert
 function showAlert(location) {
-  
+ 
+  if (currentAlertContainer) {
+    render(null, currentAlertContainer);
+    currentAlertContainer.remove();
+    currentAlertContainer = null;
+  }
+
   const container = document.createElement("div");
   document.body.appendChild(container);
 
@@ -89,9 +95,14 @@ function showAlert(location) {
 
   render(vnode, container);
 
+  currentAlertContainer = container;
+
   setTimeout(() => {
-    render(null, container);
-    container.remove();
+    if (currentAlertContainer === container) {
+      render(null, container);
+      container.remove();
+      currentAlertContainer = null;
+    }
   }, 5000);
 }
 
@@ -105,9 +116,8 @@ watch(
     }
   }
 );
-
-
 </script>
+
   
 <template>
     <div ref="mapElement" class="w-full h-full"></div>
