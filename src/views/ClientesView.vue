@@ -83,9 +83,10 @@
                 v-for="cliente in clientes"
                 :key="cliente.id"
                 :cliente="cliente"
-                class="hover:bg-green-100 transition-all text-gray-700 text-left"  
+                class="hover:bg-green-100 transition-all text-gray-700 text-left"
                 @actualizar-estado="actualizarEstado"
                 @eliminar-cliente="eliminarCliente"
+                
               />
             </tbody>
           </table>
