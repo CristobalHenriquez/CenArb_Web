@@ -26,6 +26,15 @@
       "email": "pepe@gmail.com",
       "rol": "Relevador",
       "estado": 1
+    },
+    {
+      "id": "a17a",
+      "nombre": "pedro",
+      "password": "13245678",
+      "password_confirm": "123456789",
+      "email": "marten@gmail.com",
+      "rol": "Relevador",
+      "estado": true
     }
   ],
   "relevamientos": [

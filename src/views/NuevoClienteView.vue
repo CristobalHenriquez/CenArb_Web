@@ -61,7 +61,6 @@
               label="Nombre"
               name="nombre"
               placeholder="Nombre del censista"
-              help="Coloca el nombre del cliente que deseas registrar"
               validation="required"
               :validation-messages="{ required: 'El nombre del censista es obligatorio' }"
             />
@@ -71,7 +70,6 @@
             label="Contraseña"
             name="password"
             placeholder="Contraseña"
-            help="Introduce una contraseña segura"
             validation="required|min:8"
             :validation-messages="{
                 required: 'La contraseña es obligatoria',
@@ -82,9 +80,8 @@
             <FormKit
             type="password"
             label="Confirmar Contraseña"
-            name="confirm_password"
+            name="password_confirm"
             placeholder="Confirmar contraseña"
-            help="Repite la contraseña para confirmarla"
             validation="required|same:password"
             :validation-messages="{
                 required: 'La confirmación de la contraseña es obligatoria',
