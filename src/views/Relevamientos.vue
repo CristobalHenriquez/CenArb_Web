@@ -33,32 +33,34 @@ const existenRelevamientos = computed(() => relevamientos.value.length > 0);
       </div>
       <Heading>{{ titulo }}</Heading>
           
-      <div v-if="existenRelevamientos" class="flow-root mx-auto mt-10 p-5 bg-white shadow">
-          <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div class="min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                  <table class="min-w-full divide-y divide-gray-300">
-                      <thead>
-                          <tr>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">ID</th>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">Especie</th>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">Altura</th>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">Diámetro</th>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">Estado sanitario</th>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">Ubicación</th>
-                              <th scope="col" class="p-2 text-center text-sm font-extrabold text-gray-600">Observaciones</th>
-                          </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-200 bg-lime-100">
-                          <Relevamiento
-                              v-for="relevamiento in relevamientos"
-                              :key="relevamiento.id"
-                              :relevamiento="relevamiento"
-                          />
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </div>     
+      <div v-if="existenRelevamientos" class="flow-root mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+  <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+    <div class="min-w-full py-2 align-middle sm:px-6 lg:px-8">
+      <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-gradient-to-r from-green-800 to-lime-700 text-white">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">ID</th>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Especie</th>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Altura</th>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Diámetro</th>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Estado sanitario</th>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Ubicación</th>
+            <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Observaciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-gray-50">
+          <Relevamiento
+            v-for="relevamiento in relevamientos"
+            :key="relevamiento.id"
+            :relevamiento="relevamiento"
+            class="hover:bg-green-100 transition-all text-gray-700"
+          />
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
       
       <p v-else>No hay relevamientos</p>
   </div>
