@@ -24,7 +24,7 @@
 
 <template>
     <tr>
-  <td class="whitespace-nowrap py-2 pr-3 text-sm sm:pl-0 text-center rounded-l-full bg-gray-200">
+  <td class="whitespace-nowrap py-2 pr-3 text-sm sm:pl-0 text-center bg-gray-200">
     <p class="font-medium text-gray-900">{{ cliente.nombre }}</p>
   </td>        
   <td class="whitespace-nowrap px-3 pl-3 py-2 text-sm text-center items-center justify-center text-gray-500 bg-gray-200">
@@ -39,7 +39,7 @@
       {{ estadoCliente ? 'Activo' : 'Inactivo' }}
     </button>
   </td>
-  <td class="whitespace-nowrap px-3 py-2 text-sm rounded-r-full text-gray-500 bg-gray-200">
+  <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 bg-gray-200">
     <RouterLink 
       :to="{ name:'editar-cliente', params:{id: cliente.id}}"
       class="text-indigo-600 hover:text-indigo-900 ml-10 mr-5"
