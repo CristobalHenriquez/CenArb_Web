@@ -1,18 +1,18 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import RelevamientoService from '@/services/RelevamientoService';
+import ArbolService from '@/services/ArbolService';  // Cambié RelevamientoService por ArbolService
 import RouterLink from '../components/UI/RouterLink.vue';
 import Heading from '../components/UI/Heading.vue';
-import Relevamiento from '../components/Relevamiento.vue';
+import Arbol from '../components/Arbol.vue';  // Cambié Relevamiento por Arbol
 
-const relevamientos = ref([]);
+const arboles = ref([]);  // Cambié relevamientos por arboles
 
 onMounted(() => {
-    RelevamientoService.obtenerRelevamientos()
+    ArbolService.obtenerArboles()  // Cambié obtenerRelevamientos por obtenerArboles
         .then(({ data }) => {
-            relevamientos.value = data;
+            arboles.value = data;
         })
-        .catch(error => console.error('Error obteniendo relevamientos', error));
+        .catch(error => console.error('Error obteniendo árboles', error));  // Cambié relevamientos por árboles
 });
 
 defineProps({
@@ -21,7 +21,7 @@ defineProps({
     }
 });
 
-const existenRelevamientos = computed(() => relevamientos.value.length > 0);
+const existenArboles = computed(() => arboles.value.length > 0);  // Cambié relevamientos por arboles
 </script>
 
 <template>
@@ -33,7 +33,7 @@ const existenRelevamientos = computed(() => relevamientos.value.length > 0);
       </div>
       <Heading>{{ titulo }}</Heading>
           
-      <div v-if="existenRelevamientos" class="flow-root mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+      <div v-if="existenArboles" class="flow-root mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">  <!-- Cambié existenRelevamientos por existenArboles -->
   <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
     <div class="min-w-full py-2 align-middle sm:px-6 lg:px-8">
       <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
@@ -49,10 +49,10 @@ const existenRelevamientos = computed(() => relevamientos.value.length > 0);
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-gray-50">
-          <Relevamiento
-            v-for="relevamiento in relevamientos"
-            :key="relevamiento.id"
-            :relevamiento="relevamiento"
+          <Arbol
+            v-for="arbol in arboles"  
+            :key="arbol.id"
+            :arbol="arbol"  
             class="hover:bg-green-100 transition-all text-gray-700"
           />
         </tbody>
@@ -62,6 +62,6 @@ const existenRelevamientos = computed(() => relevamientos.value.length > 0);
 </div>
 
       
-      <p v-else>No hay relevamientos</p>
+      <p v-else>No hay árboles</p>  <!-- Cambié relevamientos por árboles -->
   </div>
 </template>

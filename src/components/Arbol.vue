@@ -3,41 +3,34 @@
     import { RouterLink } from 'vue-router';
 
     const props = defineProps({
-        relevamiento:{
+        arbol: {  // Cambié 'relevamiento' por 'arbol'
             type: Object
         }
     })
-
-
-
-   
-    
-
 </script>
 
 <template>
     <tr>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-        <p class="text-gray-500">{{ relevamiento.id }}</p>
+        <p class="text-gray-500">{{ arbol.id }}</p>  <!-- Cambié relevamiento por arbol -->
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-        <p class="text-gray-500">{{ relevamiento.especie }}</p>
+        <p class="text-gray-500">{{ arbol.id_especie }}</p>  
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ relevamiento.altura }}</p>
+            <p class="text-gray-500">{{ arbol.tipo_altura }}</p>  <!-- Cambié relevamiento por arbol -->
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ relevamiento.diametro }}</p>
+            <p class="text-gray-500">{{ arbol.tipo_diametro_tronco }}</p>  <!-- Cambié relevamiento por arbol -->
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ relevamiento.estadoSanitario }}</p>
+            <p class="text-gray-500">{{ arbol.estadoSanitario }}</p>  <!-- Cambié relevamiento por arbol -->
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ relevamiento.ubicacion }}</p>
+            <p class="text-gray-500">{{ arbol.calle }}  {{ arbol.numero_aprox }}</p>  <!-- Cambié relevamiento por arbol -->
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ relevamiento.observaciones }}</p>
+            <p class="text-gray-500">{{ arbol.detalles_arbol }}</p>  <!-- Cambié relevamiento por arbol -->
         </td>
-
     </tr>
 </template>
