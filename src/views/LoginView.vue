@@ -36,10 +36,9 @@ const handleLogin = async () => {
       if (token) {
         // Guardar el token en localStorage
         localStorage.setItem('token', token);
-        console.log('✅ Token guardado en localStorage:', token);
         
         // Redirigir a la página principal o dashboard
-        router.push('/dashboard'); // Ajusta la ruta según tu aplicación
+        router.push('/municipio'); // Ajusta la ruta según tu aplicación
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);

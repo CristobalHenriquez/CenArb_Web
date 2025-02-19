@@ -9,7 +9,6 @@ api.interceptors.request.use((config) => {
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log("Token enviado en la solicitud:", config.headers.Authorization); // ✅ Verificación
   } else {
     console.warn("⚠️ No hay token en localStorage");
   }
