@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
-defineProps({
+const props = defineProps({
   items: { type: Array, required: true },
   bgColor: { type: String, default: '#26473c' },
   hvColor: { type: String, default: '#3c6354' },
@@ -9,17 +9,33 @@ defineProps({
   hvTxColor: { type: String, default: '#3c6354' },
   txAlign: { type: String, default: 'center' },
   color: { type: String, default: 'white' },
-  pL: { type: String, default: 'p-0' },
-  pR: { type: String, default: 'p-0' }
+  initialDirection: { type: String, default: 'left' }
 });
 
 const carousel = ref(null);
 const isDragging = ref(false);
 const startX = ref(0);
 const scrollLeft = ref(0);
-
-// Almacena el índice del elemento sobre el cual está el mouse
 const hoveredIndex = ref(null);
+
+
+const setInitialScroll = () => {
+  if (!carousel.value) return;
+  if (props.initialDirection === 'right') {
+    carousel.value.scrollLeft = carousel.value.scrollWidth - carousel.value.clientWidth;
+  } else {
+    carousel.value.scrollLeft = 0;
+  }
+};
+
+
+onMounted(() => {
+  setTimeout(setInitialScroll, 100);
+});
+
+watch(() => props.initialDirection, () => {
+  setTimeout(setInitialScroll, 100);
+});
 
 const startDrag = (e) => {
   isDragging.value = true;
@@ -38,13 +54,12 @@ const stopDrag = () => {
   isDragging.value = false;
 };
 
-//Hover
 const handleMouseEnter = (index) => {
-  hoveredIndex.value = index; 
+  hoveredIndex.value = index;
 };
 
 const handleMouseLeave = () => {
-  hoveredIndex.value = null; 
+  hoveredIndex.value = null;
 };
 </script>
 
@@ -68,13 +83,10 @@ const handleMouseLeave = () => {
       @mouseenter="handleMouseEnter(index)"
       @mouseleave="handleMouseLeave"
     >
-      <div class="w-auto px-5"
-      @mouseenter="handleMouseEnter(index)"
-      @mouseleave="handleMouseLeave"
-      >
-        <h5 class="text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.length }}</h5>
-        <h4 class="text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.name }}</h4>
-        <h3 class="text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.prov }}</h3>
+      <div class="w-auto px-5">
+        <h5 class="text-2xl md:text-3xl xl:text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.length }}</h5>
+        <h4 class="text-xl md:text-2xl xl:text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.name }}</h4>
+        <h3 class="text-xl md:text-2xl xl:text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.prov }}</h3>
       </div>
     </div>
   </div>

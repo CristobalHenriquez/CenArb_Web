@@ -92,7 +92,7 @@
 
 <template>
   <!-- Primer cuadro -->
-    <div class="w-full h-auto bg-white py-20">
+    <div class="w-full h-auto bg-white py-14">
       <h1 class="font-semibold text-center text-5xl pb-16 text-[#042825]">Bienvenido municipio de Rosario</h1>
       <div class="flex flex-col space-y-10 md:space-y-0 md:flex-row md:justify-center md:space-x-24 xl:space-x-40">
         <div class="flex flex-col items-center">
@@ -124,39 +124,39 @@
       </div>
     </div>
     <!-- Segundo cuadro -->
-    <div class="h-auto py-20 bg-gradient-to-b from-[#b0c298] to-[#b0c298bd]">
+    <div class="h-auto py-14 bg-gradient-to-b from-[#b0c298] to-[#b0c298bd]">
       <h1 class="font-semibold text-center text-5xl pb-16 text-[#042825]">Datos del municipio</h1>
-      <div class="flex flex-col items-center space-y-10 md:space-y-0 md:flex-row md:justify-center md:space-x-10 xl:space-x-40">
+      <div class="flex flex-col items-center space-y-10 md:space-y-0 md:flex-row md:justify-center md:space-x-3 xl:space-x-40">
 
-        <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
+        <div class="w-72 md:w-60 xl:w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-4 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
             <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500 K</p>
             <p class="text-black text-lg xl:text-2xl">Árboles relevados</p>
           </div>
-          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/tree-decidious-svgrepo-com.svg" alt="Árbol">
+          <img class="w-20 sm:w-14 md:w-20 xl:w-24 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
         </div>
 
-        <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
+        <div class="w-72 md:w-60 xl:w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
             <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">290 T</p>
             <p class="text-black text-lg xl:text-2xl">Absorción de CO2 Aprox</p>
           </div>
-          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/co2-gas-svgrepo-com.svg" alt="CO2">
+          <img class="w-20 sm:w-14 md:w-20 xl:w-24 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
         </div>
 
-        <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
+        <div class="w-72 md:w-60 xl:w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
             <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500</p>
             <p class="text-black text-lg xl:text-2xl">Especies de árboles</p>
           </div>
-          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/trees-tree-svgrepo-com.svg" alt="Especies de árboles">
+          <img class="w-20 sm:w-14 md:w-20 xl:w-24 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
         </div>
 
       </div>
     </div>
     
     <!-- Mapa -->
-    <div class="h-auto py-20 bg-white">
+    <div class="h-auto py-14 bg-white">
       <h1 class="font-semibold text-center text-5xl pb-16 text-[#042825]">Mapa interactivo</h1>
       <div class="flex justify-center">
         <div class="w-3/4 h-[550px] border-[#042825] border-8 rounded-3xl">

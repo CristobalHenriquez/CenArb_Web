@@ -65,7 +65,7 @@ const recoverPassword = () => {
             </div>
         </div>
         <button type="submit" class="w-1/5 h-16 rounded-full bg-[#72AB26] text-white">INICIAR SESIÓN ></button>
-            <div class="forgot-password mt-4 ">
+            <div class="forgot-password mt-4 -mb-[1.20rem] ">
                 <button @click="recoverPassword"> ¿Olvidaste tu contraseña? </button>
             </div>
       </div>
