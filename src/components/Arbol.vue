@@ -16,9 +16,11 @@ const especieNombre = computed(() => {
 
 <template>
     <tr>
-        <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ arbol.id }}</p>
-        </td>
+        <td class="px-6 py-3 text-center text-sm">
+                  <router-link :to="`/arbol/${arbol.id}`" class="text-blue-500 hover:underline">
+                    {{ arbol.id }}
+                  </router-link>
+                </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
             <p class="text-gray-500">{{ especieNombre }}</p>  <!-- Muestra el nombre de la especie directamente -->
         </td>

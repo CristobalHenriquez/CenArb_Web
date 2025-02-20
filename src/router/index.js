@@ -33,6 +33,13 @@ const router = createRouter({
       meta: { requiresAuth: true } // Ruta privada
     },
     {
+      path: '/arbol/:id',
+      name: 'arboldetalle',
+      component: () => import('../views/ArbolDetalle.vue'),
+      props: true,
+      meta: { requiresAuth: true } // Ruta privada
+    },
+    {
       path: '/municipio',
       name: 'municipio',
       component: () => import('../views/MunicipioView.vue'),
