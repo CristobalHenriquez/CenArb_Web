@@ -1,7 +1,21 @@
-import axios from 'axios'
+import axios from "axios";
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000'
-})
+  baseURL: "http://desarrollo.cenarb.net/api",
+});
 
-export default api
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    console.warn("⚠️ No hay token en localStorage");
+  }
+
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
+export default api;
