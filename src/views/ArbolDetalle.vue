@@ -27,7 +27,7 @@
       </div>
   
       <!-- Contenedor para imagen y detalles, usando flex -->
-      <div class="flex justify-between items-start mb-4">
+      <div class="flex justify-between items-start mb-4 bg-gray-200 rounded-lg">
         <!-- Foto del Árbol -->
         <div class="w-1/2 pr-4">
           <img src="../assets/img/euca.jpg" alt="Imagen del Árbol" class="w-full h-auto rounded-lg shadow-lg object-contain">
@@ -35,7 +35,7 @@
   
         <!-- Detalles del Árbol -->
         <div class="w-1/2">
-          <h2 class="text-2xl font-bold mb-4">Detalles del Árbol (ID: {{ arbol.id_arbol }})</h2>
+          <h2 class="text-2xl font-bold mb-4">Detalles del Árbol</h2>
       
           <!-- Datos Básicos -->
           <div class="mb-4">
