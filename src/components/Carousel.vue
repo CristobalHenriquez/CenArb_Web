@@ -30,6 +30,7 @@ const setInitialScroll = () => {
 
 
 onMounted(() => {
+  console.log(props.items);
   setTimeout(setInitialScroll, 100);
 });
 
@@ -84,7 +85,7 @@ const handleMouseLeave = () => {
       @mouseleave="handleMouseLeave"
     >
       <div class="w-auto px-5">
-        <h5 class="text-2xl md:text-3xl xl:text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.length }}</h5>
+        <h5 class="text-2xl md:text-3xl xl:text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.index.length }}</h5>
         <h4 class="text-xl md:text-2xl xl:text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.name }}</h4>
         <h3 class="text-xl md:text-2xl xl:text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.prov }}</h3>
       </div>

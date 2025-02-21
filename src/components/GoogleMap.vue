@@ -60,19 +60,19 @@ function initMap() {
   console.log("Mapa inicializado:", map.value);
   
   setTimeout(updateMarkers, 1000);
-  setTimeout(updateMunicipios, 1000); // Llamada para mostrar municipios
+  setTimeout(updateMunicipios, 1000); 
 }
 
 function updateMarkers() {
   if (map.value) {
     const markers = props.locations.map((location) => {
       const marker = new google.maps.Marker({
-        position: { lat: location.lat / 1000000, lng: location.lng / 1000000 }, // Ajustar las coordenadas
+        position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
         title: location.name,
         map: map.value,
       });
 
-      // Evento click para mostrar el alert personalizado
+
       marker.addListener("click", () => {
         if (route.name === "home") {
           showAlert(location);
@@ -82,7 +82,7 @@ function updateMarkers() {
       return marker;
     });
 
-    // Agrupación de marcadores
+
     new MarkerClusterer({ map: map.value, markers: markers });
   }
 }

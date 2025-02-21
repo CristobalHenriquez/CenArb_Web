@@ -18,7 +18,6 @@ const especies = ref([]);
 const cargarMunicipios = async () => {
   try {
     const response = await MunicipioService.obtenerMunicipios();
-
     locations.value = response.data.map(municipio => ({
       id: municipio.id,
       name: municipio.nombre,
