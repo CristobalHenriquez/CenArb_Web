@@ -47,7 +47,7 @@
   
       <!-- Contenedor del formulario -->
       <div class="mx-auto mt-10 bg-[rgb(75,101,98)] shadow-lg rounded-lg md:w-2/3">
-        <div class="py-10 px-6 md:px-10 text-white">
+        <div class="py-10 px-6 md:px-10 text-black">
           <FormKit
             type="form"
             submit-label="Agregar censista"
@@ -102,11 +102,15 @@
   
             <!-- Campo Rol -->
             <FormKit
-              type="text"
+              type="select"
               label="Rol"
               name="rol"
-              placeholder="Rol del censista"
-              />
+              placeholder="Selecciona el rol del censista"
+              :options="[
+                { label: 'Relevador', value: 'relevador' },
+                { label: 'Técnico', value: 'tecnico' }
+              ]"
+            />
             </FormKit>
         </div>
       </div>
