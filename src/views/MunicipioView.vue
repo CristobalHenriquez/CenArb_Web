@@ -133,7 +133,7 @@
             <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500 K</p>
             <p class="text-black text-lg xl:text-2xl">Árboles relevados</p>
           </div>
-          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/tree-decidious-svgrepo-com.svg" alt="Árbol">
+          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
         </div>
 
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
@@ -141,7 +141,7 @@
             <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">290 T</p>
             <p class="text-black text-lg xl:text-2xl">Absorción de CO2 Aprox</p>
           </div>
-          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/co2-gas-svgrepo-com.svg" alt="CO2">
+          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
         </div>
 
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
@@ -149,7 +149,7 @@
             <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500</p>
             <p class="text-black text-lg xl:text-2xl">Especies de árboles</p>
           </div>
-          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/trees-tree-svgrepo-com.svg" alt="Especies de árboles">
+          <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
         </div>
 
       </div>

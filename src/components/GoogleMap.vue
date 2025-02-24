@@ -8,7 +8,7 @@ const props = defineProps({
   center: {
     type: Object,
     required: true,
-  },  
+  },
   zoom: {
     type: Number,
     required: true,
@@ -17,11 +17,16 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  municipios: {
+    type: Array,
+    required: true,
+  }
 });
 
 const mapElement = ref(null);
 const map = ref(null);
 const route = useRoute();
+let currentAlertContainer = null; 
 
 onMounted(() => {
   loadGoogleMaps();
@@ -40,26 +45,34 @@ function loadGoogleMaps() {
 }
 
 function initMap() {
+  console.log("Inicializando el mapa...");
+  if (!mapElement.value) {
+    console.error("Elemento del mapa no encontrado.");
+    return;
+  }
+
   map.value = new google.maps.Map(mapElement.value, {
-    center: props.center,
+    center: props.center, 
     zoom: props.zoom,
     disableDefaultUI: true,
   });
 
-  updateMarkers();
+  console.log("Mapa inicializado:", map.value);
+  
+  setTimeout(updateMarkers, 1000);
+  setTimeout(updateMunicipios, 1000); 
 }
 
 function updateMarkers() {
   if (map.value) {
-
     const markers = props.locations.map((location) => {
       const marker = new google.maps.Marker({
-        position: { lat: location.lat, lng: location.lng },
+        position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
         title: location.name,
         map: map.value,
       });
 
-      // Evento click para mostrar el alert personalizado
+
       marker.addListener("click", () => {
         if (route.name === "home") {
           showAlert(location);
@@ -69,14 +82,42 @@ function updateMarkers() {
       return marker;
     });
 
-    // Agrupación de marcadores
+
     new MarkerClusterer({ map: map.value, markers: markers });
   }
 }
 
-// Función para mostrar el alert
+// Función para agregar los municipios al mapa
+function updateMunicipios() {
+  if (map.value) {
+    const municipioMarkers = props.municipios.map((municipio) => {
+      const marker = new google.maps.Marker({
+        position: { lat: municipio.latitud / 1000000, lng: municipio.longitud / 1000000 }, // Ajustar las coordenadas
+        title: municipio.nombre,
+        map: map.value,
+      });
+
+      // Evento click para mostrar el alert del municipio
+      marker.addListener("click", () => {
+        showMunicipioAlert(municipio);
+      });
+
+      return marker;
+    });
+
+    // Agrupación de marcadores de municipios
+    new MarkerClusterer({ map: map.value, markers: municipioMarkers });
+  }
+}
+
+// Mostrar el alert
 function showAlert(location) {
-  
+  if (currentAlertContainer) {
+    render(null, currentAlertContainer);
+    currentAlertContainer.remove();
+    currentAlertContainer = null;
+  }
+
   const container = document.createElement("div");
   document.body.appendChild(container);
 
@@ -89,26 +130,35 @@ function showAlert(location) {
 
   render(vnode, container);
 
+  currentAlertContainer = container;
+
   setTimeout(() => {
-    render(null, container);
-    container.remove();
+    if (currentAlertContainer === container) {
+      render(null, container);
+      container.remove();
+      currentAlertContainer = null;
+    }
   }, 5000);
 }
 
+// Mostrar el alert del municipio
+function showMunicipioAlert(municipio) {
+  alert(`Municipio: ${municipio.nombre}\nProvincia: ${municipio.provincia.nombre}`);
+}
+
 watch(
-  () => [props.center, props.zoom, props.locations],
+  () => [props.center, props.zoom, props.locations, props.municipios],
   () => {
     if (map.value) {
       map.value.setCenter(props.center);
       map.value.setZoom(props.zoom);
       updateMarkers();
+      updateMunicipios();
     }
   }
 );
-
-
 </script>
-  
+
 <template>
-    <div ref="mapElement" class="w-full h-full"></div>
-</template> 
+  <div ref="mapElement" class="w-full h-full"></div>
+</template>
