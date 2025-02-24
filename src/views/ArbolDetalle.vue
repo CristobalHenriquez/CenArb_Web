@@ -41,7 +41,7 @@
           <div class="mb-4">
             <p><strong>Especie:</strong> {{ arbol.especie.nombre_cientifico }}</p>
             <p><strong>Municipio:</strong> {{ arbol.id_municipio }}</p>
-            <p><strong>Coordenadas:</strong> Lat: {{ arbol.latitude }}, Long: {{ arbol.longitude }}</p>
+            <p><strong>Coordenadas:</strong> Lat: {{ arbol.latitud }}, Long: {{ arbol.longitud }}</p>
             <p><strong>Dirección:</strong> {{ arbol.calle }} {{ arbol.numero_aprox }}</p>
             <p><strong>Identificación:</strong> {{ arbol.identificacion }}</p>
             <p><strong>Barrio:</strong> {{ arbol.barrio }}</p>

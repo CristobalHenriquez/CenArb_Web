@@ -18,26 +18,23 @@ const especieNombre = computed(() => {
     <tr>
         <td class="px-6 py-3 text-center text-sm">
                   <router-link :to="`/arbol/${arbol.id}`" class="text-blue-500 hover:underline">
-                    {{ arbol.id }}
+                    {{ especieNombre }}
                   </router-link>
                 </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ especieNombre }}</p>  <!-- Muestra el nombre de la especie directamente -->
+            <p class="text-gray-500">{{ arbol.fecha_censo }}</p>
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ arbol.tipo_altura }}</p>
+            <p class="text-gray-500">{{ arbol.tipo_condición_general }}</p>
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ arbol.tipo_diametro_tronco }}</p>
+            <p class="text-gray-500">{{ arbol.calle }}</p>
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ arbol.estadoSanitario }}</p>
+            <p class="text-gray-500">{{ arbol.barrio }}</p>
         </td>
         <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ arbol.calle }} {{ arbol.numero_aprox }}</p>
-        </td>
-        <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
-            <p class="text-gray-500">{{ arbol.detalles_arbol }}</p>
+            <p class="text-gray-500">{{ arbol.requiere_intervencion ? 'Sí' : 'No' }}</p>
         </td>
     </tr>
 </template>
