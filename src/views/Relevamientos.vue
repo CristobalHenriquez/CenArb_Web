@@ -47,8 +47,8 @@ const arbolesOrdenados = computed(() => {
 
         // Ordenar por fecha de censo
         if (criterioOrdenacion.value === 'fecha') {
-            const fechaA = new Date(a.fecha_censo);
-            const fechaB = new Date(b.fecha_censo);
+            const fechaA = new Date(a.created_at);
+            const fechaB = new Date(b.created_at);
             valorA = fechaA;
             valorB = fechaB;
         } 

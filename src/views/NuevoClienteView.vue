@@ -2,30 +2,26 @@
     import { FormKit } from '@formkit/vue';
     import { useRouter } from 'vue-router';
     import ClienteService from '@/services/ClienteService';
-    import RouterLink  from '../components/UI/RouterLink.vue';
+    import RouterLink from '../components/UI/RouterLink.vue';
     import Heading from '../components/UI/Heading.vue';
-
     
-    const router = useRouter()
-
-    
+    const router = useRouter();
 
     defineProps({
-        titulo:{
-        type: String
-        }
-    })
+        titulo: {
+            type: String,
+        },
+    });
 
-    const handleSubmit= (data) => {
-        data.estado = 1
+    const handleSubmit = (data) => {
+        data.estado = 1; // Define el estado como activo
         ClienteService.agregarCliente(data)
-            .then(respuesta => {
-                console.log(respuesta)
-                router.push('/')
+            .then((respuesta) => {
+                console.log(respuesta);
+                router.push('/');
             })
-            .catch(error => console.log(error))
-    }
-
+            .catch((error) => console.log(error));
+    };
 </script>
 
 <template>
@@ -59,37 +55,36 @@
             <FormKit
               type="text"
               label="Nombre"
-              name="nombre"
+              name="name"
               placeholder="Nombre del censista"
               validation="required"
               :validation-messages="{ required: 'El nombre del censista es obligatorio' }"
             />
         
             <FormKit
-            type="password"
-            label="Contraseña"
-            name="password"
-            placeholder="Contraseña"
-            validation="required|min:8"
-            :validation-messages="{
-                required: 'La contraseña es obligatoria',
-                min: 'La contraseña debe tener al menos 8 caracteres'
-            }"
+              type="password"
+              label="Contraseña"
+              name="password"
+              placeholder="Contraseña"
+              validation="required|min:8"
+              :validation-messages="{
+                  required: 'La contraseña es obligatoria',
+                  min: 'La contraseña debe tener al menos 8 caracteres'
+              }"
             />
 
             <FormKit
-            type="password"
-            label="Confirmar Contraseña"
-            name="password_confirm"
-            placeholder="Confirmar contraseña"
-            validation="required|same:password"
-            :validation-messages="{
-                required: 'La confirmación de la contraseña es obligatoria',
-                same: 'Las contraseñas no coinciden'
-            }"
+              type="password"
+              label="Confirmar Contraseña"
+              name="password_confirmation"
+              placeholder="Confirmar contraseña"
+              validation="required|same:password"
+              :validation-messages="{
+                  required: 'La confirmación de la contraseña es obligatoria',
+                  same: 'Las contraseñas no coinciden'
+              }"
             />
 
-  
             <!-- Campo Email -->
             <FormKit
               type="email"
@@ -98,28 +93,27 @@
               placeholder="Email del censista"
               validation="required|email"
               :validation-messages="{ required: 'El email del censista es obligatorio', email: 'Coloca un email válido' }"
-              />
+            />
   
             <!-- Campo Rol -->
             <FormKit
               type="select"
               label="Rol"
-              name="rol"
+              name="role"
               placeholder="Selecciona el rol del censista"
               :options="[
                 { label: 'Relevador', value: 'relevador' },
                 { label: 'Técnico', value: 'tecnico' }
               ]"
             />
-            </FormKit>
+          </FormKit>
         </div>
       </div>
     </div>
-  </template>
-  
-  <style>
-  .formkit-wrapper {
+</template>
+
+<style>
+.formkit-wrapper {
     max-width: 100%;
-  }
-  </style>
-  
+}
+</style>

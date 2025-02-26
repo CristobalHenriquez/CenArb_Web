@@ -73,55 +73,54 @@ const eliminarCliente = id => {
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen">
-        <!-- Contenedor de enlaces -->
-        <div class="flex justify-end space-x-4 p-4">
-            <RouterLink to="agregar-cliente" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition">
-                Agregar Censista
-            </RouterLink>
-            <RouterLink to="municipio" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md transition">
-                Volver
-            </RouterLink>
-        </div>
+  <div class="flex flex-col min-h-screen">
+      <!-- Contenedor de enlaces -->
+      <div class="flex justify-end space-x-4 p-4">
+          <RouterLink to="agregar-cliente" class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded-lg shadow-md transition">
+              Agregar Censista
+          </RouterLink>
+          <RouterLink to="municipio" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+              Volver
+          </RouterLink>
+      </div>
 
-        <Heading>{{ titulo }}</Heading>
+      <Heading>{{ titulo }}</Heading>
 
-        <div v-if="existenClientes" class="flow-root mt-10 w-full sm:w-[500px] md:w-[800px] mx-auto">
-            <!-- Fondo contrastante -->
-            <div class="bg-gray-300 p-5 shadow-lg">
-                <!-- Tabla con encabezado estilizado -->
-                <div class="overflow-hidden">
-                    <table class="min-w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white shadow-md rounded-lg">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="p-3 text-left text-sm font-bold uppercase">Nombre</th>
-                                <th scope="col" class="p-3 text-left text-sm font-bold uppercase">Rol</th>
-                                <th scope="col" class="p-3 text-left text-sm font-bold uppercase">Estado</th>
-                                <th scope="col" class="p-3 text-left text-sm font-bold uppercase">Acciones</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+      <div v-if="existenClientes" class="flow-root mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+          <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+              <div class="min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                  <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
+                      <thead class="bg-green-800 text-white">
+                          <tr>
+                              <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                                  Nombre
+                              </th>
+                              <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                                  Rol
+                              </th>
+                              <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                                  Estado
+                              </th>
+                              <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                                  Acciones
+                              </th>
+                          </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200 bg-gray-50">
+                          <Cliente
+                              v-for="cliente in clientes"
+                              :key="cliente.id"
+                              :cliente="cliente"
+                              class="hover:bg-green-100 transition-all text-gray-700"
+                              @actualizar-estado="actualizarEstado"
+                              @eliminar-cliente="eliminarCliente"
+                          />
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
 
-                <!-- Contenedor de la tabla -->
-                <div class="w-full">
-                    <table class="min-w-full divide-y divide-gray-300">
-                        <tbody class="divide-y-0 divide-gray-200">
-                            <Cliente
-                                v-for="cliente in clientes"
-                                :key="cliente.id"
-                                :cliente="cliente"
-                                class="hover:bg-green-100 transition-all text-gray-700 text-left"
-                                @actualizar-estado="actualizarEstado"
-                                @eliminar-cliente="eliminarCliente"
-                            />
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-        </div>
-
-        <p v-else class="text-center text-gray-600 mt-5">No hay clientes</p>
-    </div>
+      <p v-else class="text-center text-gray-600 mt-5">No hay clientes</p>
+  </div>
 </template>

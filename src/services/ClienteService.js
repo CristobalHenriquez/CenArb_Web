@@ -24,7 +24,7 @@ export default {
 
   // Agregar un nuevo cliente
   agregarCliente(data, userRole) {
-    return api.post('/clientes', data, {
+    return api.post('/registerUser', data, {
       headers: {
         Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
       }
