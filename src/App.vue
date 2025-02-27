@@ -1,7 +1,22 @@
 <script setup>
-  import { RouterView, useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
 
-  const route = useRoute();
+const route = useRoute();
+const router = useRouter();
+
+const isLoggedIn = ref(!!localStorage.getItem("token"));
+
+const logout = () => {
+  localStorage.removeItem("token");
+  console.log("Token eliminado:", localStorage.getItem('token'));
+  isLoggedIn.value = false;
+  router.push("/");
+};
+
+onMounted(() => {
+  isLoggedIn.value = !!localStorage.getItem("token");
+});
 </script>
 
 <template>
@@ -17,21 +32,21 @@
 
    
     <div class="header-content">
-      <!-- Si la ruta es 'home', mostrar 'Login' -->
-      <RouterLink 
-        v-if="route.name === 'home'"
-        to="/login"
-        class="block rounded-full bg-blue-700 hover:bg-blue-500 py-2 px-3 text-white text-center uppercase font-bold shadow text-sm">
-        ENTRAR
-      </RouterLink>
+      <RouterLink
+      v-if="!isLoggedIn && route.path !== '/login'"
+      to="/login"
+      class="block rounded-full bg-blue-700 hover:bg-blue-500 py-2 px-3 text-white text-center uppercase font-bold shadow text-sm"
+    >
+      ENTRAR
+    </RouterLink>
 
-      <!-- Si la ruta es 'login', NO mostrar el botón -->
-      <RouterLink 
-        v-else-if="route.name !== 'login'"
-        to="/"
-        class="block rounded-full bg-red-700 hover:bg-red-500 py-2 px-3 text-white text-center uppercase font-bold shadow text-sm">
-        Salir
-      </RouterLink>
+    <button
+      v-if="isLoggedIn"
+      @click="logout"
+      class="block rounded-full bg-red-700 hover:bg-red-500 py-2 px-3 w-40 text-white text-center uppercase font-bold shadow text-sm"
+    >
+      Salir
+    </button>
 
       <div class="social-icons">
         <a href="https://www.facebook.com" target="_blank">

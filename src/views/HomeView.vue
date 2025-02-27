@@ -10,14 +10,19 @@ import EspecieService from "@/services/EspecieService";
 const mapCenter = { lat: -40.691200, lng: -63.616672 }
 const mapZoom = 4
 
+const cargando = ref(true);
 
 const locations = ref([]);
 const arboles = ref([]);
 const especies = ref([]);
 
 const cargarMunicipios = async () => {
+  cargando.value = true;
   try {
     const response = await MunicipioService.obtenerMunicipios();
+    if (!response || !response.data || !Array.isArray(response.data)) {
+      throw new Error("Respuesta inválida al obtener municipios.");
+    }
     locations.value = response.data.map(municipio => ({
       id: municipio.id,
       name: municipio.nombre,
@@ -25,44 +30,51 @@ const cargarMunicipios = async () => {
       lng: municipio.longitud,
       prov: municipio.provincia
     }));
+    console.log(locations.value);
   } catch (error) {
     console.error("Error cargando municipios:", error);
+  } finally {
+    cargando.value = false;
   }
 };
 
+
 const cargarArboles = async () => {
+  cargando.value = true;
   try {
     const response = await ArbolService.obtenerArboles();
-
+    if (!response || !response.data) {
+      throw new Error("Respuesta inválida al obtener árboles.");
+    }
     arboles.value = response.data.map(arbol => ({
-      idArbol: arbol.id,
+      id: arbol.id,
       idMunicipio: arbol.municipio,
     }));
   } catch (error) {
     console.error("Error cargando árboles:", error);
+  } finally {
+    cargando.value = false;
   }
 };
 
 const cargarEspecies = async () => {
+  cargando.value = true;
   try {
     const response = await EspecieService.obtenerEspecies();
-    especies.value = response.data.map(especie => ({
-      idEspecie: especie.id,
-      nombre: especie.nombre
-    }));
+    if (!response || !response.data) {
+      throw new Error("Respuesta inválida al obtener especies.");
+    }
+    if (response.data) {
+      especies.value = response.data.map(especie => ({
+        id: especie.id
+      }));
+    }
   } catch (error) {
     console.error("Error cargando especies:", error);
+  } finally {
+    cargando.value = false;
   }
 };
-
-onMounted(() => {
-  cargarMunicipios();
-  cargarArboles();
-  cargarEspecies();
-});
-
-
-
 
 
 const carousel = ref(null);
@@ -85,10 +97,11 @@ const moveCarousel = () => {
 };
 
 onMounted(() => {
+  cargarMunicipios();
+  cargarArboles();
+  cargarEspecies();
   setInterval(moveCarousel, 3000);
 });
-
-
 
 </script>
 
@@ -100,7 +113,8 @@ onMounted(() => {
       <div id="map-info" class="relative xl:flex-1 xl:order-1 md:left-3 h-1/3 xl:h-full md:h-full md:w-1/2 rounded-2xl bg-[#365351] p-6 flex justify-start text-left">
         <div class="xl:pt-24 xl:pl-6 xl:pr-3 md:pt-24 md:pl-6">
           <h5 class="text-[#99a7a6] text-xl md:text-4xl xl:text-5xl font-bold opacity-70">Municipios</h5>
-          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4">Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
+          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4" v-if="cargando">Cargando Municipios...</h3>
+          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4" v-else>Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
         </div>
       </div>
 
@@ -115,35 +129,37 @@ onMounted(() => {
     </div>
 
     <!-- Datos de municipios  -->
-    <div id="datos" class="flex flex-col mt-10 w-4/5 space-y-10 md:flex-row md:h-1/3 md:space-y-0 md:space-x-6 md:mt-10 md:justify-evenly xl:w-1/5 xl:h-[550px] xl:flex-col xl:space-y-10 xl:space-x-0 xl:mt-0 ">
+    <div id="datos" class="flex flex-col mt-10 w-4/5 space-y-10 md:flex-row md:h-1/3 md:space-y-0 md:space-x-6 md:mt-10 md:justify-evenly xl:w-1/5 xl:h-[550px] xl:flex-col xl:justify-between xl:space-x-0 xl:mt-0 ">
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-[#042825]">{{ arboles.length }}</p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-if="cargando"> Cargando Arboles... </p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles.length }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Árboles relevados</p>
         </div>
-        <img class="w-20 xl:w-32 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
+        <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
       </div>
 
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-[#042825]">290 T</p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]">290 T</p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Absorción de CO2 Aprox</p>
         </div>
-        <img class="w-20 xl:w-32 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
+        <img class="w-20 xl:w-28 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
       </div>
 
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-[#042825]">{{ especies.length }}</p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-if="cargando"> Cargando Especies... </p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies.length }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Especies de árboles</p>
         </div>
-        <img class="w-20 xl:w-32 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
+        <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
       </div>
     </div>
   </div>
 
   <!-- Logos de socios -->
-  <div id="socios" class="pt-10 pb-36 flex flex-col xl:flex-row justify-evenly items-center xl:px-48">
+  <div id="socios" class="pt-10 pb-36 flex flex-col justify-evenly items-center xl:px-52 xl:flex-row">
     <h2 class="text-xl md:text-2xl text-center p-5 mb-4">
       socios comprometidos <br>
       con el cambio climático
@@ -156,14 +172,14 @@ onMounted(() => {
         class="flex transition-all duration-300 ease-in-out space-x-10"
         ref="carouselItems"
       >
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/Logo Alpa Nuevo (Negro).svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/Recurso 39.svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/Signify.svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/EUROCLIMA_horizontal ES 1.svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/Logo Alpa Nuevo (Negro).svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/Recurso 39.svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/Signify.svg" alt="socios" />
-      <img class="h-20 xl:h-16 w-64 object-contain" src="../components/icons/logosSocios/EUROCLIMA_horizontal ES 1.svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Logo Alpa Nuevo (Negro).svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Recurso 39.svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Signify.svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/EUROCLIMA_horizontal ES 1.svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Logo Alpa Nuevo (Negro).svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Recurso 39.svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Signify.svg" alt="socios" />
+      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/EUROCLIMA_horizontal ES 1.svg" alt="socios" />
       </div>
     </div>
   </div>
@@ -177,6 +193,7 @@ onMounted(() => {
 
     <!-- Primer Carrusel -->
     <Carousel 
+      v-if="!cargando"
       :items="locations" 
       bgColor="#26473c" 
       hvColor="white"
@@ -184,9 +201,11 @@ onMounted(() => {
       hvTxColor="#26473c"
       txAlign="start" 
     />
+    
 
     <!-- Segundo Carrusel -->
     <Carousel 
+      v-if="!cargando"
       :items="locations" 
       bgColor="#aea646"
       hvColor="white"
@@ -197,10 +216,10 @@ onMounted(() => {
     />
   </div>
 
-  <div class="h-auto md:h-3/4 flex flex-col md:flex-row p-6 md:p-10 justify-evenly items-center">
-    <p class="text-xl md:text-2xl xl:text-3xl md:w-3/5 xl:w-1/2 md:pr-8">
+  <div class="h-auto lg:h-3/4 flex flex-col lg:flex-row p-6 my-24 lg:p-10 justify-evenly items-center">
+    <p class="text-xl md:text-2xl xl:text-3xl md:w-4/5 xl:w-1/2 lg:pr-8">
       CenArb es una herramienta esencial para la gestión efectiva del entorno urbano frente al cambio climático. Al permitir un registro detallado y actualizado de los árboles en los municipios, facilita el monitoreo de su estado de salud y ubicación, ayudando a tomar decisiones más informadas sobre su cuidado y preservación. Con esta app, los municipios pueden optimizar la planificación urbana, fomentar la expansión de áreas verdes y mejorar la resiliencia frente a fenómenos climáticos extremos.    </p>
-    <img class="mt-5 md:mt-0 w-full md:w-1/3 xl:w-1/4 h-auto md:h-full object-cover rounded-2xl" src="/src/assets/img/smartphone.jpeg" alt="Smartphone">
+    <img class="mt-5 md:mt-8 w-full md:w-96 lg:w-1/3 xl:w-96 h-auto md:h-full object-cover rounded-2xl" src="/src/assets/img/smartphone.jpeg" alt="Smartphone">
   </div>
 
 

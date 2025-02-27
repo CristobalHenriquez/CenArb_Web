@@ -29,15 +29,6 @@ const setInitialScroll = () => {
 };
 
 
-onMounted(() => {
-  console.log(props.items);
-  setTimeout(setInitialScroll, 100);
-});
-
-watch(() => props.initialDirection, () => {
-  setTimeout(setInitialScroll, 100);
-});
-
 const startDrag = (e) => {
   isDragging.value = true;
   startX.value = e.pageX - carousel.value.offsetLeft;
@@ -62,6 +53,21 @@ const handleMouseEnter = (index) => {
 const handleMouseLeave = () => {
   hoveredIndex.value = null;
 };
+
+onMounted(() => {
+  if (props.items.length === 0) {
+    console.log("No hay datos en 'items'");
+  } else {
+    console.log("Hay datos en 'items'");
+  }
+  setTimeout(() => {
+    if (carousel.value) setInitialScroll();
+  }, 100);
+});
+
+watch(() => props.initialDirection, () => {
+  setTimeout(setInitialScroll, 100);
+});
 </script>
 
 <template>
@@ -75,7 +81,7 @@ const handleMouseLeave = () => {
   >
     <div 
       v-for="(item, index) in items" 
-      :key="index" 
+      :key="index.id" 
       :style="{ 
         backgroundColor: hoveredIndex === index ? hvColor : bgColor,
         userSelect: 'none' 
@@ -85,7 +91,7 @@ const handleMouseLeave = () => {
       @mouseleave="handleMouseLeave"
     >
       <div class="w-auto px-5">
-        <h5 class="text-2xl md:text-3xl xl:text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.index.length }}</h5>
+        <h5 class="text-2xl md:text-3xl xl:text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ items.length }}</h5>
         <h4 class="text-xl md:text-2xl xl:text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.name }}</h4>
         <h3 class="text-xl md:text-2xl xl:text-3xl font-semibold" :style="{ color: txColor, textAlign: txAlign }">{{ item.prov }}</h3>
       </div>

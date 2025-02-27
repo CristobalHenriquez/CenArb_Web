@@ -16,10 +16,6 @@ const props = defineProps({
   locations: {
     type: Array,
     required: true,
-  },
-  municipios: {
-    type: Array,
-    required: true,
   }
 });
 
@@ -45,9 +41,7 @@ function loadGoogleMaps() {
 }
 
 function initMap() {
-  console.log("Inicializando el mapa...");
   if (!mapElement.value) {
-    console.error("Elemento del mapa no encontrado.");
     return;
   }
 

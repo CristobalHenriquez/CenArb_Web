@@ -57,6 +57,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
+      meta: { requiresAuth: false }
     },
     {
       path: '/login',
@@ -69,11 +70,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-  // Si la ruta requiere autenticación y no hay token, redirige a login
-  if (to.meta.requiresAuth && !token) {
+  
+  // Si estás accediendo a la ruta 'home', no se necesita autenticación
+  if (to.name === 'home') {
+    next(); // Permite continuar a la ruta home
+  } else if (to.meta.requiresAuth && !token) {
+    // Si la ruta requiere autenticación y no hay token, redirige a login
     next({ name: 'login' });
   } else {
-    next(); // Permite continuar a la ruta
+    next(); // Permite continuar con la navegación
   }
 });
 
