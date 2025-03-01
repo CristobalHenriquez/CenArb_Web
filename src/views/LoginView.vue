@@ -87,9 +87,9 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="w-auto bg-white py-20">
+  <div class="w-auto bg-white py-20 md:py-[161px] xl:py-[42px]">
     <div class="flex flex-col items-center text-center w-full">
-      <div class="absolute w-64 top-44">
+      <div class="absolute w-64 md:top-72 top-44 xl:top-44">
         <img src="/src/components/icons/CenArb-login.svg" alt="Logo de la aplicación" />
       </div>
       <div class="md:w-3/5 xl:w-2/5 rounded-[50px] pt-36 pb-16 mb-10 mt-20 bg-[#4B6562]">
@@ -136,7 +136,7 @@ watchEffect(() => {
       <button @click="handleLogin" class="w-2/4 md:w-2/5 xl:w-1/5 h-16 rounded-full bg-[#72AB26] text-white select-none">
         INICIAR SESIÓN >
       </button>
-      <div class="forgot-password mt-4 -mb-[0.05rem] select-none">
+      <div class="forgot-password mt-4 xl:mt-7 select-none">
         <button @click="recoverPassword"> ¿Olvidaste tu contraseña? </button>
       </div>
     </div>
