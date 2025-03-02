@@ -16,6 +16,7 @@ const criterioOrdenacion = ref('especie');
 // Filtros para la búsqueda
 const filtros = ref({
   especie: '',
+  fecha: '',
   calle: '',
   barrio: ''
 });
@@ -40,10 +41,15 @@ const arbolesFiltrados = computed(() => {
     const coincideEspecie = arbol.especie?.nombre_comun.toLowerCase().includes(filtros.value.especie.toLowerCase());
     const coincideCalle = arbol.calle?.toLowerCase().includes(filtros.value.calle.toLowerCase());
     const coincideBarrio = arbol.barrio?.toLowerCase().includes(filtros.value.barrio.toLowerCase());
-    
-    return coincideEspecie && coincideCalle && coincideBarrio;
+
+    // Convertir created_at a formato YYYY-MM-DD para comparación
+    const fechaArbol = arbol.created_at ? new Date(arbol.created_at).toISOString().split('T')[0] : '';
+    const coincideFecha = !filtros.value.fecha || fechaArbol === filtros.value.fecha;
+
+    return coincideEspecie && coincideCalle && coincideBarrio && coincideFecha;
   });
 });
+
 // Función para alternar el orden de la fecha, especie, calle o barrio
 const toggleOrdenacion = (criterio) => {
   if (criterio === criterioOrdenacion.value) {
@@ -60,8 +66,8 @@ const arbolesOrdenados = computed(() => {
     let valorA, valorB;
 
     if (criterioOrdenacion.value === 'fecha') {
-      valorA = new Date(a.created_at);
-      valorB = new Date(b.created_at);
+      valorA = a.created_at ? new Date(a.created_at) : new Date(0);
+      valorB = b.created_at ? new Date(b.created_at) : new Date(0);
     } else if (criterioOrdenacion.value === 'especie') {
       valorA = a.especie ? a.especie.nombre_comun.toLowerCase() : '';
       valorB = b.especie ? b.especie.nombre_comun.toLowerCase() : '';
@@ -73,11 +79,12 @@ const arbolesOrdenados = computed(() => {
       valorB = b.barrio ? b.barrio.toLowerCase() : '';
     }
 
-    return ordenAscendente.value 
-      ? valorA < valorB ? -1 : 1 
+    return ordenAscendente.value
+      ? valorA < valorB ? -1 : 1
       : valorA > valorB ? -1 : 1;
   });
 });
+
 
 // 🆕 Función para exportar todos los detalles del árbol a Excel
 const exportarExcel = () => {
@@ -124,68 +131,82 @@ const exportarExcel = () => {
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen">
-      <!-- Navegación y Título -->
-      <Heading class="text-left">Relevamientos</Heading>
-      <div class="flex justify-end p-4 bg-white">
-        <RouterLink to="municipio">
-          Volver
-        </RouterLink>
-      </div>
-  
-      <!-- Filtro de Árboles -->
-      <div class="flex justify-between p-4 bg-gray-100">
-        <div class="flex space-x-4">
-          <input v-model="filtros.especie" type="text" placeholder="Filtrar por especie" class="p-2 border rounded" />
-          <input v-model="filtros.calle" type="text" placeholder="Filtrar por calle" class="p-2 border rounded" />
-          <input v-model="filtros.barrio" type="text" placeholder="Filtrar por barrio" class="p-2 border rounded" />
-        </div>
-      </div>
-  
-      <!-- Tabla de Árboles -->
-      <div v-if="arbolesOrdenados.length" class="flex flex-col flex-grow items-center">
-        <div class="w-full max-w-6xl p-5 bg-white shadow-lg rounded-lg">
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
-              <thead class="bg-green-800 text-white">
-                <tr>
-                  <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
-                    <button @click="toggleOrdenacion('especie')">Especie</button>
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
-                    <button @click="toggleOrdenacion('fecha')">Fecha del Censo</button>
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Estado general</th>
-                  <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
-                    <button @click="toggleOrdenacion('calle')">Calle</button>
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
-                    <button @click="toggleOrdenacion('barrio')">Barrio</button>
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Requiere intervención</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 bg-gray-50">
-                <Arbol
-                  v-for="arbol in arbolesOrdenados"
-                  :key="arbol.id"
-                  :arbol="arbol"
-                  class="hover:bg-green-100 transition-all text-gray-700"
-                />
-              </tbody>
-            </table>
-          </div>
-  
-          <!-- Botón de Exportar a Excel -->
-          <div class="flex justify-end mt-4">
-            <button @click="exportarExcel" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-              Exportar Detalle Completo a Excel
-            </button>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Mensaje cuando no hay árboles -->
-      <p v-else class="text-center text-gray-500 mt-10">No hay árboles</p>
+  <div class="flex flex-col min-h-screen">
+    <!-- Navegación y Título -->
+    <Heading class="text-left">Relevamientos</Heading>
+    <div class="flex justify-end p-4 bg-white">
+      <RouterLink to="municipio">
+        Volver
+      </RouterLink>
     </div>
+
+    <!-- Filtro de Árboles -->
+    <div class="p-4 bg-gray-100 rounded-lg shadow-md">
+      <!-- Título de la sección de filtros -->
+      <h2 class="text-lg font-semibold text-gray-700 flex items-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" viewBox="0 0 20 20"
+          fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M3 5a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L11 12.414V17a1 1 0 01-1.447.894l-2-1A1 1 0 017 16v-3.586L3.293 7.707A1 1 0 013 7V5z"
+            clip-rule="evenodd" />
+        </svg>
+        Filtros de búsqueda
+      </h2>
+
+      <!-- Contenedor de filtros -->
+      <div class="flex flex-wrap gap-4">
+        <input v-model="filtros.especie" type="text" placeholder="Filtrar por especie"
+          class="p-2 border rounded w-full sm:w-auto" />
+        <input v-model="filtros.fecha" type="date" class="p-2 border rounded w-full sm:w-auto" />
+        <input v-model="filtros.calle" type="text" placeholder="Filtrar por calle"
+          class="p-2 border rounded w-full sm:w-auto" />
+        <input v-model="filtros.barrio" type="text" placeholder="Filtrar por barrio"
+          class="p-2 border rounded w-full sm:w-auto" />
+      </div>
+    </div>
+
+
+    <!-- Tabla de Árboles -->
+    <div v-if="arbolesOrdenados.length" class="flex flex-col flex-grow items-center">
+      <div class="w-full max-w-6xl p-5 bg-white shadow-lg rounded-lg">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
+            <thead class="bg-green-800 text-white">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                  <button @click="toggleOrdenacion('especie')">Especie</button>
+                </th>
+                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                  <button @click="toggleOrdenacion('fecha')">Fecha del Censo</button>
+                </th>
+                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Estado general</th>
+                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                  <button @click="toggleOrdenacion('calle')">Calle</button>
+                </th>
+                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                  <button @click="toggleOrdenacion('barrio')">Barrio</button>
+                </th>
+                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">Requiere intervención</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-gray-50">
+              <Arbol v-for="arbol in arbolesOrdenados" :key="arbol.id" :arbol="arbol"
+                class="hover:bg-green-100 transition-all text-gray-700" />
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Botón de Exportar a Excel -->
+        <div class="flex justify-end mt-4">
+          <button @click="exportarExcel"
+            class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition">
+            Exportar a Excel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay árboles -->
+    <p v-else class="text-center text-gray-500 mt-10">No hay árboles</p>
+  </div>
 </template>
