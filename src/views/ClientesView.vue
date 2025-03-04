@@ -77,41 +77,46 @@ const eliminarCliente = id => {
     <!-- Contenedor de enlaces -->
     <div class="flex justify-end space-x-4 p-4">
       <RouterLink to="agregar-cliente"
-        class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded-lg shadow-md transition">
+        class="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
         Agregar Censista
       </RouterLink>
       <RouterLink to="municipio"
-        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
         Volver
       </RouterLink>
     </div>
 
     <Heading>{{ titulo }}</Heading>
 
-    <div v-if="existenClientes" class="flow-root mx-auto mt-10 p-5 bg-white shadow-lg rounded-lg">
+    <div v-if="existenClientes" class="flow-root mx-auto mt-10 p-5 bg-white shadow-xl rounded-lg">
       <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200 bg-white shadow-lg rounded-lg overflow-hidden">
             <thead class="bg-green-800 text-white">
               <tr>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Nombre
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Rol
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Estado
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-bold uppercase">
+                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-gray-50">
-              <Cliente v-for="cliente in clientes" :key="cliente.id" :cliente="cliente"
-                class="hover:bg-green-100 transition-all text-gray-700" @actualizar-estado="actualizarEstado"
-                @eliminar-cliente="eliminarCliente" />
+              <Cliente 
+                      v-for="cliente in clientes" 
+                      :key="cliente.id" 
+                      :cliente="cliente"
+                      class="hover:bg-green-200 transition-all duration-200 ease-in-out transform hover:scale-101 hover:shadow-md text-gray-700"
+                      @actualizar-estado="actualizarEstado"
+                      @eliminar-cliente="eliminarCliente"
+                    />
             </tbody>
           </table>
         </div>
