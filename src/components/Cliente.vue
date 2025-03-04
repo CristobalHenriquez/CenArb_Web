@@ -17,31 +17,38 @@
 
 <template>
     <tr>
-        <td class="whitespace-nowrap py-2 pr-3 text-sm sm:pl-0 text-center bg-gray-200">
-            <p class="font-medium text-gray-900">{{ cliente.name }}</p>  <!-- Cambié 'user' por 'cliente' -->
+        <!-- Nombre del cliente -->
+        <td class="px-6 py-3 text-center text-sm">
+            <p class="text-gray-900 font-medium">{{ cliente.name }}</p>
         </td>        
-        <td class="whitespace-nowrap px-3 pl-3 py-2 text-sm text-center items-center justify-center text-gray-500 bg-gray-200">
-            <p class="text-gray-900 font-bold">{{ cliente.role }}</p>  <!-- Cambié 'user.rol' por 'cliente.role' -->
+
+        <!-- Rol del cliente -->
+        <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
+            <p class="text-gray-900 font-bold">{{ cliente.role }}</p>
         </td>
-        <td class="whitespace-nowrap px-3 py-2 text-sm text-center bg-gray-200">
+
+        <!-- Estado del cliente -->
+        <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
             <button 
-                class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 bg-gray-200"
+                class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
                 :class="[estadoCliente ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']"
-                @click="$event => $emit('actualizar-estado', {id: cliente.id, estado: cliente.estado})"
+                @click="$emit('actualizar-estado', { id: cliente.id, estado: cliente.estado })"
             >
                 {{ estadoCliente ? 'Activo' : 'Inactivo' }}
             </button>
         </td>
-        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 bg-gray-200">
+
+        <!-- Acciones -->
+        <td class="whitespace-nowrap py-4 px-3 text-sm text-center">
             <RouterLink 
-                :to="{ name:'editar-cliente', params:{id: cliente.id}}"
-                class="text-indigo-600 hover:text-indigo-900 ml-10 mr-5"
+                :to="{ name: 'editar-cliente', params: { id: cliente.id } }"
+                class="text-blue-500 hover:underline mr-4"
             >
                 Editar
             </RouterLink>
             <button 
                 class="text-red-600 hover:text-red-900"
-                @click="$event => $emit('eliminar-cliente', cliente.id)"
+                @click="$emit('eliminar-cliente', cliente.id)"
             >
                 Eliminar
             </button>
