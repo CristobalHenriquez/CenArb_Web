@@ -33,7 +33,7 @@ function loadGoogleMaps() {
     initMap();
   } else {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAwWgC0Dp1_RRFobXOf1syZ-dOAypz4tks&callback=initMap&libraries=visualization,places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&callback=initMap&libraries=visualization,places`;
     script.async = true;
     document.head.appendChild(script);
     window.initMap = initMap;
@@ -49,9 +49,7 @@ function initMap() {
     center: props.center, 
     zoom: props.zoom,
     disableDefaultUI: true,
-  });
-
-  console.log("Mapa inicializado:", map.value);
+  });  
   
   setTimeout(updateMarkers, 1000);
   setTimeout(updateMunicipios, 1000); 

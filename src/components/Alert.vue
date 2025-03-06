@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from "vue";
 
-// Propiedades pasadas al componente
 const props = defineProps({
   name: String,
   arboles: Number,
@@ -9,21 +8,18 @@ const props = defineProps({
   especies: Number,
 });
 
-// Mostrar alerta
 const showAlert = ref(true);
 
-// Cerrar alerta
 function closeAlert() {
   showAlert.value = false;
 }
 
 // Mostrar alerta con los datos del municipio
 function showMunicipioAlert(municipio) {
-  // Actualizar los datos del municipio en el alert
   props.name = municipio.nombre;
-  props.arboles = municipio.arboles; // Asegúrate de que estos datos estén disponibles en municipio
-  props.co2 = municipio.co2; // Igual para CO2
-  props.especies = municipio.especies; // Igual para especies
+  props.arboles = municipio.arboles;
+  props.co2 = municipio.co2; 
+  props.especies = municipio.especies;
 }
 
 </script>

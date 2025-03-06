@@ -16,20 +16,26 @@ const locations = ref([]);
 const arboles = ref([]);
 const especies = ref([]);
 
+onMounted(() => {
+  cargarMunicipios();
+  cargarArboles();
+  cargarEspecies();
+  setInterval(moveCarousel, 3000);
+});
+
 const cargarMunicipios = async () => {
   cargando.value = true;
   try {
     const response = await MunicipioService.obtenerMunicipios();
+    console.log("Respuesta de la API:", response);
     if (!response || !response.data || !Array.isArray(response.data)) {
       throw new Error("Respuesta inválida al obtener municipios.");
     }
-    locations.value = response.data.map(municipio => ({
-      id: municipio.id,
+    locations.value.splice(0, locations.value.length, ...response.data.map(municipio => ({
       name: municipio.nombre,
       lat: municipio.latitud,
       lng: municipio.longitud,
-      prov: municipio.provincia
-    }));
+    })));
     console.log("Municipios cargados:", locations.value);
   } catch (error) {
     console.error("Error cargando municipios:", error);
@@ -42,14 +48,14 @@ const cargarMunicipios = async () => {
 const cargarArboles = async () => {
   cargando.value = true;
   try {
-    const response = await ArbolService.obtenerArboles();
+    const response = await ArbolService.mostrarArboles();
     if (!response || !response.data) {
       throw new Error("Respuesta inválida al obtener árboles.");
     }
-    arboles.value = response.data.map(arbol => ({
-      id: arbol.id,
-      idMunicipio: arbol.municipio,
-    }));
+    arboles.value = [{
+      totalArboles: response.data.total_arboles,
+    }];
+
   } catch (error) {
     console.error("Error cargando árboles:", error);
   } finally {
@@ -57,24 +63,25 @@ const cargarArboles = async () => {
   }
 };
 
+
 const cargarEspecies = async () => {
   cargando.value = true;
   try {
-    const response = await EspecieService.obtenerEspecies();
+    const response = await EspecieService.mostrarEspecies();
     if (!response || !response.data) {
       throw new Error("Respuesta inválida al obtener especies.");
     }
-    if (response.data) {
-      especies.value = response.data.map(especie => ({
-        id: especie.id
-      }));
-    }
+    especies.value = [{
+      totalEspecies: response.data.total_especies,
+    }];
+
   } catch (error) {
     console.error("Error cargando especies:", error);
   } finally {
     cargando.value = false;
   }
 };
+
 
 
 const carousel = ref(null);
@@ -96,18 +103,12 @@ const moveCarousel = () => {
   }
 };
 
-onMounted(() => {
-  cargarMunicipios();
-  cargarArboles();
-  cargarEspecies();
-  setInterval(moveCarousel, 3000);
-});
-
+console.log("verifico locations", locations.value)
 </script>
 
 <template>
 
-<a target="_blank" class="z-10 fixed top-[92%] left-[85%] md:top-[92%] md:left-[93%] xl:top-[92%] xl:left-[96%]" href="https://wa.me/5493415071162"><svg width="50px" height="50px" viewBox="-1.44 -1.44 50.88 50.88" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" stroke="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0" transform="translate(6.48,6.48), scale(0.73)"><rect x="-1.44" y="-1.44" width="50.88" height="50.88" rx="25.44" fill="#ffffff" strokewidth="0"></rect></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#000000" stroke-width="5.28"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke-width="0.9120000000000001" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke-width="0.9120000000000001" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg></a>
+<a target="_blank" class="z-10 fixed top-[92%] left-[85%] md:top-[92%] md:left-[93%] xl:top-[92%] xl:left-[96%]" href="https://wa.me/5493415071162"><svg width="50px" height="50px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> <path id="a" d="M1023.941 765.153c0 5.606-.171 17.766-.508 27.159-.824 22.982-2.646 52.639-5.401 66.151-4.141 20.306-10.392 39.472-18.542 55.425-9.643 18.871-21.943 35.775-36.559 50.364-14.584 14.56-31.472 26.812-50.315 36.416-16.036 8.172-35.322 14.426-55.744 18.549-13.378 2.701-42.812 4.488-65.648 5.3-9.402.336-21.564.505-27.15.505l-504.226-.081c-5.607 0-17.765-.172-27.158-.509-22.983-.824-52.639-2.646-66.152-5.4-20.306-4.142-39.473-10.392-55.425-18.542-18.872-9.644-35.775-21.944-50.364-36.56-14.56-14.584-26.812-31.471-36.415-50.314-8.174-16.037-14.428-35.323-18.551-55.744-2.7-13.378-4.487-42.812-5.3-65.649-.334-9.401-.503-21.563-.503-27.148l.08-504.228c0-5.607.171-17.766.508-27.159.825-22.983 2.646-52.639 5.401-66.151 4.141-20.306 10.391-39.473 18.542-55.426C34.154 93.24 46.455 76.336 61.07 61.747c14.584-14.559 31.472-26.812 50.315-36.416 16.037-8.172 35.324-14.426 55.745-18.549 13.377-2.701 42.812-4.488 65.648-5.3 9.402-.335 21.565-.504 27.149-.504l504.227.081c5.608 0 17.766.171 27.159.508 22.983.825 52.638 2.646 66.152 5.401 20.305 4.141 39.472 10.391 55.425 18.542 18.871 9.643 35.774 21.944 50.363 36.559 14.559 14.584 26.812 31.471 36.415 50.315 8.174 16.037 14.428 35.323 18.551 55.744 2.7 13.378 4.486 42.812 5.3 65.649.335 9.402.504 21.564.504 27.15l-.082 504.226z"></path> </defs> <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="512.001" y1=".978" x2="512.001" y2="1025.023"> <stop offset="0" stop-color="#61fd7d"></stop> <stop offset="1" stop-color="#2bb826"></stop> </linearGradient> <use xlink:href="#a" overflow="visible" fill="url(#b)"></use> <g> <path fill="#FFF" d="M783.302 243.246c-69.329-69.387-161.529-107.619-259.763-107.658-202.402 0-367.133 164.668-367.214 367.072-.026 64.699 16.883 127.854 49.017 183.522l-52.096 190.229 194.665-51.047c53.636 29.244 114.022 44.656 175.482 44.682h.151c202.382 0 367.128-164.688 367.21-367.094.039-98.087-38.121-190.319-107.452-259.706zM523.544 808.047h-.125c-54.767-.021-108.483-14.729-155.344-42.529l-11.146-6.612-115.517 30.293 30.834-112.592-7.259-11.544c-30.552-48.579-46.688-104.729-46.664-162.379.066-168.229 136.985-305.096 305.339-305.096 81.521.031 158.154 31.811 215.779 89.482s89.342 134.332 89.312 215.859c-.066 168.243-136.984 305.118-305.209 305.118zm167.415-228.515c-9.177-4.591-54.286-26.782-62.697-29.843-8.41-3.062-14.526-4.592-20.645 4.592-6.115 9.182-23.699 29.843-29.053 35.964-5.352 6.122-10.704 6.888-19.879 2.296-9.176-4.591-38.74-14.277-73.786-45.526-27.275-24.319-45.691-54.359-51.043-63.543-5.352-9.183-.569-14.146 4.024-18.72 4.127-4.109 9.175-10.713 13.763-16.069 4.587-5.355 6.117-9.183 9.175-15.304 3.059-6.122 1.529-11.479-.765-16.07-2.293-4.591-20.644-49.739-28.29-68.104-7.447-17.886-15.013-15.466-20.645-15.747-5.346-.266-11.469-.322-17.585-.322s-16.057 2.295-24.467 11.478-32.113 31.374-32.113 76.521c0 45.147 32.877 88.764 37.465 94.885 4.588 6.122 64.699 98.771 156.741 138.502 21.892 9.45 38.982 15.094 52.308 19.322 21.98 6.979 41.982 5.995 57.793 3.634 17.628-2.633 54.284-22.189 61.932-43.615 7.646-21.427 7.646-39.791 5.352-43.617-2.294-3.826-8.41-6.122-17.585-10.714z"></path> </g> </g></svg></a>
   <!-- Mapa de Argentina -->
   <div id="datos-y-mapa" class="flex flex-col xl:px-28 xl:flex-row xl:justify-evenly items-center xl:space-x-6 pt-20">
     <div id="map" class="w-4/5 md:w-5/6 xl:w-3/5 h-[700px] xl:h-[550px] md:h-[570px] rounded-2xl overflow-hidden flex flex-col md:flex-row xl:flex-row">
@@ -115,7 +116,7 @@ onMounted(() => {
         <div class="xl:pt-24 xl:pl-6 xl:pr-3 md:pt-24 md:pl-6">
           <h5 class="text-[#99a7a6] text-xl md:text-4xl xl:text-5xl font-extrabold opacity-70">Municipios</h5>
           <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4" v-if="cargando">Cargando Municipios...</h3>
-          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-semibold my-4" v-else>Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
+          <h3 class="text-white text-xl md:text-3xl xl:text-5xl font-semibold my-4" v-else>Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
         </div>
       </div>
 
@@ -134,7 +135,7 @@ onMounted(() => {
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
           <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-if="cargando"> Cargando Arboles... </p>
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles.length }} </p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles[0].totalArboles }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Árboles relevados</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
@@ -151,7 +152,7 @@ onMounted(() => {
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
           <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-if="cargando"> Cargando Especies... </p>
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies.length }} </p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies[0].totalEspecies }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Especies de árboles</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
@@ -160,15 +161,15 @@ onMounted(() => {
   </div>
 
   <!-- Logos de socios -->
-  <div id="socios" class="pt-10 pb-36 flex flex-col justify-evenly items-center xl:px-52 xl:flex-row">
-    <h2 class="text-xl md:text-2xl text-center xl:text-start p-5 mb-4"> 
+  <div id="socios" class="pt-10 pb-36 flex flex-col justify-evenly items-center xl:px-[10%] xl:flex-row">
+    <h2 class="text-xl md:text-2xl text-center xl:text-start pr-5 py-5 mb-4"> 
       <!--centrado a la izquierda -->
       socios comprometidos <br>
       con el cambio climático
     </h2>
     <div
       ref="carousel"
-      class="flex items-center justify-end xl:w-4/5 overflow-hidden relative"
+      class="flex items-center justify-end xl:w-9/12 overflow-hidden relative"
     >
       <div
         class="flex transition-all duration-300 ease-in-out space-x-10"
@@ -195,7 +196,6 @@ onMounted(() => {
 
     <!-- Primer Carrusel -->
     <Carousel 
-      v-if="locations.length > 0"
       :items="locations" 
       bgColor="#26473c" 
       hvColor="white"
@@ -207,7 +207,6 @@ onMounted(() => {
 
     <!-- Segundo Carrusel -->
     <Carousel 
-      v-if="locations.length > 0"
       :items="locations" 
       bgColor="#aea646"
       hvColor="white"

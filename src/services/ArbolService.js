@@ -15,5 +15,14 @@ export default {
   },
   eliminarArbol(id) {
     return api.delete(`/arbol/${id}`);
+  },
+  mostrarArboles(){
+    return api.get('/totalArboles')
+  },
+  mostrarArbolesPorMunicipio(){
+    return api.get('/totalArbolesMunicipio')
+  },
+  mostrarEspeciesPorMunicipio(){
+    return api.get('/totalEspeciesPorMunicipio')
   }
 };
