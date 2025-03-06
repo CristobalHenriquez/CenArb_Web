@@ -30,7 +30,7 @@ const cargarMunicipios = async () => {
       lng: municipio.longitud,
       prov: municipio.provincia
     }));
-    console.log(locations.value);
+    console.log("Municipios cargados:", locations.value);
   } catch (error) {
     console.error("Error cargando municipios:", error);
   } finally {
@@ -113,9 +113,9 @@ onMounted(() => {
     <div id="map" class="w-4/5 md:w-5/6 xl:w-3/5 h-[700px] xl:h-[550px] md:h-[570px] rounded-2xl overflow-hidden flex flex-col md:flex-row xl:flex-row">
       <div id="map-info" class="relative xl:flex-1 xl:order-1 md:left-3 h-1/3 xl:h-full md:h-full md:w-1/2 rounded-2xl bg-[#365351] p-6 flex justify-start text-left">
         <div class="xl:pt-24 xl:pl-6 xl:pr-3 md:pt-24 md:pl-6">
-          <h5 class="text-[#99a7a6] text-xl md:text-4xl xl:text-5xl font-bold opacity-70">Municipios</h5>
+          <h5 class="text-[#99a7a6] text-xl md:text-4xl xl:text-5xl font-extrabold opacity-70">Municipios</h5>
           <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4" v-if="cargando">Cargando Municipios...</h3>
-          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4" v-else>Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
+          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-semibold my-4" v-else>Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
         </div>
       </div>
 
@@ -161,7 +161,8 @@ onMounted(() => {
 
   <!-- Logos de socios -->
   <div id="socios" class="pt-10 pb-36 flex flex-col justify-evenly items-center xl:px-52 xl:flex-row">
-    <h2 class="text-xl md:text-2xl text-center p-5 mb-4">
+    <h2 class="text-xl md:text-2xl text-center xl:text-start p-5 mb-4"> 
+      <!--centrado a la izquierda -->
       socios comprometidos <br>
       con el cambio climático
     </h2>
@@ -194,7 +195,7 @@ onMounted(() => {
 
     <!-- Primer Carrusel -->
     <Carousel 
-      v-if="!cargando"
+      v-if="locations.length > 0"
       :items="locations" 
       bgColor="#26473c" 
       hvColor="white"
@@ -206,7 +207,7 @@ onMounted(() => {
 
     <!-- Segundo Carrusel -->
     <Carousel 
-      v-if="!cargando"
+      v-if="locations.length > 0"
       :items="locations" 
       bgColor="#aea646"
       hvColor="white"
