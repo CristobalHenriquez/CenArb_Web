@@ -219,7 +219,9 @@ console.log("verifico locations", locations.value)
 
   <div class="h-auto lg:h-3/4 flex flex-col lg:flex-row p-6 my-24 lg:p-10 justify-evenly items-center">
     <p class="text-xl md:text-2xl xl:text-3xl md:w-4/5 xl:w-1/2 lg:pr-8">
-      CenArb es una herramienta esencial para la gestión efectiva del entorno urbano frente al cambio climático. Al permitir un registro detallado y actualizado de los árboles en los municipios, facilita el monitoreo de su estado de salud y ubicación, ayudando a tomar decisiones más informadas sobre su cuidado y preservación. Con esta app, los municipios pueden optimizar la planificación urbana, fomentar la expansión de áreas verdes y mejorar la resiliencia frente a fenómenos climáticos extremos.    </p>
+      CenArb es una herramienta esencial para la gestión efectiva del entorno urbano frente al cambio climático.
+      <br>Al permitir un registro detallado y actualizado de los árboles en los municipios, facilita el monitoreo de su estado de salud y ubicación, ayudando a tomar decisiones más informadas sobre su cuidado y preservación.
+      <br>Con esta app, los municipios pueden optimizar la planificación urbana, fomentar la expansión de áreas verdes y mejorar la resiliencia frente a fenómenos climáticos extremos.    </p>
     <img class="mt-5 md:mt-8 w-full md:w-96 lg:w-1/3 xl:w-96 h-auto md:h-full object-cover rounded-2xl" src="/src/assets/img/smartphone.jpeg" alt="Smartphone">
   </div>
 
