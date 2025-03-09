@@ -33,7 +33,7 @@ function loadGoogleMaps() {
     initMap();
   } else {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAwWgC0Dp1_RRFobXOf1syZ-dOAypz4tks&callback=initMap&libraries=visualization,places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBDlb_ABZT1ebnSZavPYttU_8oscxbQoF8&callback=initMap&libraries=visualization,places`;
     script.async = true;
     document.head.appendChild(script);
     window.initMap = initMap;
