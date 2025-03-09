@@ -63,7 +63,14 @@ onMounted(() => {
   setTimeout(() => {
     if (carousel.value) setInitialScroll();
   }, 100);
+  setTimeout(() => {
+  console.log("Contenido del carrusel:", carousel.value?.innerHTML);
+}, 500);
 });
+
+watch(() => props.items, (newItems) => {
+  console.log("Nuevos items recibidos en Carousel:", newItems);
+}, { deep: true });
 
 watch(() => props.initialDirection, () => {
   setTimeout(setInitialScroll, 100);
@@ -81,7 +88,7 @@ watch(() => props.initialDirection, () => {
   >
     <div 
       v-for="(item, index) in items" 
-      :key="index.id" 
+      :key="index"
       :style="{ 
         backgroundColor: hoveredIndex === index ? hvColor : bgColor,
         userSelect: 'none' 

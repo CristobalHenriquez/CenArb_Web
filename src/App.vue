@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router";
-import { ref, onMounted } from "vue";
+import { ref, watchEffect } from "vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -9,12 +9,12 @@ const isLoggedIn = ref(!!localStorage.getItem("token"));
 
 const logout = () => {
   localStorage.removeItem("token");
-  console.log("Token eliminado:", localStorage.getItem('token'));
   isLoggedIn.value = false;
   router.push("/");
 };
 
-onMounted(() => {
+
+watchEffect(() => {
   isLoggedIn.value = !!localStorage.getItem("token");
 });
 </script>
@@ -22,7 +22,14 @@ onMounted(() => {
 <template>
   <header class="bg-[rgb(75,101,98)] flex justify-between items-center px-5 md:px-12 xl:px-28 py-8">
   <div class="flex-shrink-0 mr-8">
-    <RouterLink to="/">
+    <RouterLink
+    v-if="isLoggedIn"
+    to="/municipio">
+      <img src="./components/icons/AppArbolado2.png" alt="Logo app" class="h-10 md:h-16 xl:h-20 mx-auto cursor-pointer">
+    </RouterLink>
+    <RouterLink
+    v-else
+    to="/">
       <img src="./components/icons/AppArbolado2.png" alt="Logo app" class="h-10 md:h-16 xl:h-20 mx-auto cursor-pointer">
     </RouterLink>
   </div>
