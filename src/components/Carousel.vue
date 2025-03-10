@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -54,27 +54,11 @@ const handleMouseLeave = () => {
   hoveredIndex.value = null;
 };
 
-onMounted(() => {
-  if (props.items.length === 0) {
-    console.log("No hay datos en 'items'");
-  } else {
-    console.log("Hay datos en 'items'");
-  }
-  setTimeout(() => {
-    if (carousel.value) setInitialScroll();
-  }, 100);
-  setTimeout(() => {
-  console.log("Contenido del carrusel:", carousel.value?.innerHTML);
-}, 500);
-});
-
 watch(() => props.items, (newItems) => {
-  console.log("Nuevos items recibidos en Carousel:", newItems);
-}, { deep: true });
-
-watch(() => props.initialDirection, () => {
-  setTimeout(setInitialScroll, 100);
-});
+  if (newItems.length) {
+    setTimeout(setInitialScroll, 500);
+  }
+}, { deep: true, immediate: true });
 </script>
 
 <template>

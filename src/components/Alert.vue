@@ -2,7 +2,7 @@
 import { ref } from "vue";
 
 const props = defineProps({
-  name: String,
+  municipio: String,
   arboles: Number,
   co2: Number,
   especies: Number,
@@ -16,10 +16,10 @@ function closeAlert() {
 
 // Mostrar alerta con los datos del municipio
 function showMunicipioAlert(municipio) {
-  props.name = municipio.nombre;
-  props.arboles = municipio.arboles;
-  props.co2 = municipio.co2; 
-  props.especies = municipio.especies;
+  props.municipio = municipio.municipio;
+  props.arboles = municipio.totalArboles;
+  props.co2 = municipio.co2 || 0;
+  props.especies = municipio.especies || 0;
 }
 
 </script>
@@ -30,7 +30,7 @@ function showMunicipioAlert(municipio) {
       <button @click="closeAlert" class="absolute top-3 right-4 text-white text-3xl font-bold">&times;</button>
 
       <div class="flex w-3/4 md:w-full justify-center">
-        <h1 class="font-bold text-base md:text-2xl pb-4 md:pb-10">Municipio de {{ name }}</h1>
+        <h1 class="font-bold text-base md:text-2xl pb-4 md:pb-10">Municipio de {{ municipio }}</h1>
       </div>
 
       <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">

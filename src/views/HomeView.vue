@@ -23,11 +23,11 @@ onMounted(() => {
   setInterval(moveCarousel, 3000);
 });
 
+//Función para mostrar municipios
 const cargarMunicipios = async () => {
   cargando.value = true;
   try {
     const response = await MunicipioService.obtenerMunicipios();
-    console.log("Respuesta de la API:", response);
     if (!response || !response.data || !Array.isArray(response.data)) {
       throw new Error("Respuesta inválida al obtener municipios.");
     }
@@ -36,7 +36,6 @@ const cargarMunicipios = async () => {
       lat: municipio.latitud,
       lng: municipio.longitud,
     })));
-    console.log("Municipios cargados:", locations.value);
   } catch (error) {
     console.error("Error cargando municipios:", error);
   } finally {
@@ -44,26 +43,34 @@ const cargarMunicipios = async () => {
   }
 };
 
-
+//Función para mostrar arboles, haciendo 3 busquedas en paralelo
 const cargarArboles = async () => {
   cargando.value = true;
   try {
-    const response = await ArbolService.mostrarArboles();
-    if (!response || !response.data) {
-      throw new Error("Respuesta inválida al obtener árboles.");
+    const [arbolesResponse, arbolesPorMunicipioResponse, especiesPorMunicipioResponse] = await Promise.all([
+      ArbolService.mostrarArboles(),
+      ArbolService.mostrarArbolesPorMunicipio(),
+      ArbolService.mostrarEspeciesPorMunicipio(),
+    ]);
+    if (!arbolesResponse || !arbolesResponse.data || 
+        !arbolesPorMunicipioResponse || !arbolesPorMunicipioResponse.data || 
+        !especiesPorMunicipioResponse || !especiesPorMunicipioResponse.data) {
+      throw new Error("Respuesta inválida al obtener árboles o especies.");
     }
     arboles.value = [{
-      totalArboles: response.data.total_arboles,
-    }];
-
+      totalArboles: arbolesResponse.data.total_arboles,
+      totalArbolesPorMunicipio: arbolesPorMunicipioResponse.data.total_arboles_municipio,
+      totalEspeciesPorMunicipio: especiesPorMunicipioResponse.data.total_especies_municipio
+    }];    
   } catch (error) {
-    console.error("Error cargando árboles:", error);
+    console.error("Error cargando árboles o especies:", error);
   } finally {
     cargando.value = false;
   }
 };
 
 
+//Función para mostrar especies
 const cargarEspecies = async () => {
   cargando.value = true;
   try {
@@ -74,7 +81,6 @@ const cargarEspecies = async () => {
     especies.value = [{
       totalEspecies: response.data.total_especies,
     }];
-
   } catch (error) {
     console.error("Error cargando especies:", error);
   } finally {
@@ -102,8 +108,6 @@ const moveCarousel = () => {
     }
   }
 };
-
-console.log("verifico locations", locations.value)
 </script>
 
 <template>
@@ -115,8 +119,19 @@ console.log("verifico locations", locations.value)
       <div id="map-info" class="relative xl:flex-1 xl:order-1 md:left-3 h-1/3 xl:h-full md:h-full md:w-1/2 rounded-2xl bg-[#365351] p-6 flex justify-start text-left">
         <div class="xl:pt-24 xl:pl-6 xl:pr-3 md:pt-24 md:pl-6">
           <h5 class="text-[#99a7a6] text-xl md:text-4xl xl:text-5xl font-extrabold opacity-70">Municipios</h5>
-          <h3 class="text-white text-xl md:text-4xl xl:text-5xl font-bold my-4" v-if="cargando">Cargando Municipios...</h3>
-          <h3 class="text-white text-xl md:text-3xl xl:text-5xl font-semibold my-4" v-else>Somos {{ locations.length }} municipios activos contra el cambio climático</h3>
+          <h3 class="text-white text-xl md:text-3xl xl:text-5xl font-semibold my-4">Somos 
+            <svg v-if="cargando" class="text-gray-300 animate-spin md:w-10 md:h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24">
+            <path
+              d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+              stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path
+              d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+              stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900">
+            </path>
+          </svg>
+            <span v-else>{{ locations.length }}</span>
+             municipios activos contra el cambio climático</h3>
         </div>
       </div>
 
@@ -134,7 +149,16 @@ console.log("verifico locations", locations.value)
     <div id="datos" class="flex flex-col mt-10 w-4/5 space-y-10 md:flex-row md:h-1/3 md:space-y-0 md:space-x-6 md:mt-10 md:justify-evenly xl:w-1/5 xl:h-[550px] xl:flex-col xl:justify-between xl:space-x-0 xl:mt-0 ">
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-if="cargando"> Cargando Arboles... </p>
+          <svg v-if="cargando" class="text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24">
+            <path
+              d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+              stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path
+              d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+              stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900">
+            </path>
+          </svg>
           <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles[0].totalArboles }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Árboles relevados</p>
         </div>
@@ -151,7 +175,16 @@ console.log("verifico locations", locations.value)
 
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-if="cargando"> Cargando Especies... </p>
+          <svg v-if="cargando" class="text-gray-300 animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+            width="24" height="24">
+            <path
+              d="M32 3C35.8083 3 39.5794 3.75011 43.0978 5.20749C46.6163 6.66488 49.8132 8.80101 52.5061 11.4939C55.199 14.1868 57.3351 17.3837 58.7925 20.9022C60.2499 24.4206 61 28.1917 61 32C61 35.8083 60.2499 39.5794 58.7925 43.0978C57.3351 46.6163 55.199 49.8132 52.5061 52.5061C49.8132 55.199 46.6163 57.3351 43.0978 58.7925C39.5794 60.2499 35.8083 61 32 61C28.1917 61 24.4206 60.2499 20.9022 58.7925C17.3837 57.3351 14.1868 55.199 11.4939 52.5061C8.801 49.8132 6.66487 46.6163 5.20749 43.0978C3.7501 39.5794 3 35.8083 3 32C3 28.1917 3.75011 24.4206 5.2075 20.9022C6.66489 17.3837 8.80101 14.1868 11.4939 11.4939C14.1868 8.80099 17.3838 6.66487 20.9022 5.20749C24.4206 3.7501 28.1917 3 32 3L32 3Z"
+              stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path
+              d="M32 3C36.5778 3 41.0906 4.08374 45.1692 6.16256C49.2477 8.24138 52.7762 11.2562 55.466 14.9605C58.1558 18.6647 59.9304 22.9531 60.6448 27.4748C61.3591 31.9965 60.9928 36.6232 59.5759 40.9762"
+              stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-900">
+            </path>
+          </svg>
           <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies[0].totalEspecies }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Especies de árboles</p>
         </div>
