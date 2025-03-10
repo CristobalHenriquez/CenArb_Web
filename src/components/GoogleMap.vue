@@ -16,6 +16,10 @@ const props = defineProps({
   locations: {
     type: Array,
     required: true,
+  },
+  arboles: {
+    type: Array,
+    required: true,
   }
 });
 
@@ -24,11 +28,8 @@ const map = ref(null);
 const route = useRoute();
 let currentAlertContainer = null; 
 
-onMounted(() => {
-  loadGoogleMaps();
-});
-
-function loadGoogleMaps() {
+// Cargar la API de Google Maps de manera eficiente
+const loadGoogleMaps = async () => {
   if (window.google) {
     initMap();
   } else {
@@ -38,90 +39,70 @@ function loadGoogleMaps() {
     document.head.appendChild(script);
     window.initMap = initMap;
   }
-}
+};
 
-function initMap() {
-  if (!mapElement.value) {
-    return;
-  }
+// Iniciar el mapa
+const initMap = () => {
+  if (!mapElement.value) return;
 
   map.value = new google.maps.Map(mapElement.value, {
-    center: props.center, 
+    center: props.center,
     zoom: props.zoom,
     disableDefaultUI: true,
-  });  
-  
+  });
+
   setTimeout(updateMarkers, 1000);
-  setTimeout(updateMunicipios, 1000); 
-}
+};
 
-function updateMarkers() {
-  if (map.value) {
-    const markers = props.locations.map((location) => {
-      const marker = new google.maps.Marker({
-        position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
-        title: location.name,
-        map: map.value,
-      });
+// Actualizar los marcadores
+const updateMarkers = () => {
+  if (!map.value) return;
 
-
-      marker.addListener("click", () => {
-        if (route.name === "home") {
-          showAlert(location);
-        }
-      });
-
-      return marker;
+  const markers = props.locations.map((location) => {
+    const marker = new google.maps.Marker({
+      position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
+      title: location.name,
+      map: map.value,
     });
 
-
-    new MarkerClusterer({ map: map.value, markers: markers });
-  }
-}
-
-// Función para agregar los municipios al mapa
-function updateMunicipios() {
-  if (map.value) {
-    const municipioMarkers = props.municipios.map((municipio) => {
-      const marker = new google.maps.Marker({
-        position: { lat: municipio.latitud / 1000000, lng: municipio.longitud / 1000000 }, // Ajustar las coordenadas
-        title: municipio.nombre,
-        map: map.value,
-      });
-
-      // Evento click para mostrar el alert del municipio
-      marker.addListener("click", () => {
-        showMunicipioAlert(municipio);
-      });
-
-      return marker;
+    marker.addListener("click", () => {
+      if (route.name === "home") {
+        showAlert(location);
+      }
     });
 
-    // Agrupación de marcadores de municipios
-    new MarkerClusterer({ map: map.value, markers: municipioMarkers });
-  }
-}
+    return marker;
+  });
 
-// Mostrar el alert
-function showAlert(location) {
+  new MarkerClusterer({ map: map.value, markers });
+};
+
+// Mostrar alerta
+const showAlert = (location) => {
+  const municipioData = props.arboles[0];
+  const municipio = municipioData.totalEspeciesPorMunicipio.find((municipio) =>
+    municipio.municipio.trim().toLowerCase() === location.name.trim().toLowerCase()
+  );
+
+  const arboles = municipio ? municipio.totalArboles : 0;
+  const co2 = municipio ? municipio.co2 : 0;
+  const especies = municipio ? municipio.totalEspecies : 0;
+
+  createAndDisplayAlert(location.name, arboles, co2, especies);
+};
+
+// Función para crear y mostrar un alerta
+const createAndDisplayAlert = (nombre, arboles, co2, especies) => {
   if (currentAlertContainer) {
     render(null, currentAlertContainer);
     currentAlertContainer.remove();
-    currentAlertContainer = null;
   }
 
   const container = document.createElement("div");
   document.body.appendChild(container);
 
-  const vnode = createVNode(Alert, {
-    name: location.name,
-    arboles: location.arboles,
-    co2: location.co2,
-    especies: location.especies,
-  });
-
+  const vnode = createVNode(Alert, { nombre, arboles, co2, especies });
   render(vnode, container);
-
   currentAlertContainer = container;
 
   setTimeout(() => {
@@ -131,24 +112,17 @@ function showAlert(location) {
       currentAlertContainer = null;
     }
   }, 5000);
-}
+};
 
-// Mostrar el alert del municipio
-function showMunicipioAlert(municipio) {
-  alert(`Municipio: ${municipio.nombre}\nProvincia: ${municipio.provincia.nombre}`);
-}
-
-watch(
-  () => [props.center, props.zoom, props.locations, props.municipios],
-  () => {
-    if (map.value) {
-      map.value.setCenter(props.center);
-      map.value.setZoom(props.zoom);
-      updateMarkers();
-      updateMunicipios();
-    }
+watch([() => props.center, () => props.zoom, () => props.locations], () => {
+  if (map.value) {
+    map.value.setCenter(props.center);
+    map.value.setZoom(props.zoom);
+    updateMarkers();
   }
-);
+});
+
+onMounted(loadGoogleMaps);
 </script>
 
 <template>

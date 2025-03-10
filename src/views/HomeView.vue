@@ -6,12 +6,10 @@ import MunicipioService from "@/services/MunicipioService";
 import ArbolService from "@/services/ArbolService";
 import EspecieService from "@/services/EspecieService";
 
-
-const mapCenter = { lat: -40.691200, lng: -63.616672 }
-const mapZoom = 4
+const mapCenter = { lat: -40.691200, lng: -63.616672 };
+const mapZoom = 4;
 
 const cargando = ref(true);
-
 const locations = ref([]);
 const arboles = ref([]);
 const especies = ref([]);
@@ -23,19 +21,17 @@ onMounted(() => {
   setInterval(moveCarousel, 3000);
 });
 
-//Función para mostrar municipios
+// Cargar municipios
 const cargarMunicipios = async () => {
   cargando.value = true;
   try {
     const response = await MunicipioService.obtenerMunicipios();
-    if (!response || !response.data || !Array.isArray(response.data)) {
-      throw new Error("Respuesta inválida al obtener municipios.");
-    }
-    locations.value.splice(0, locations.value.length, ...response.data.map(municipio => ({
+    if (!response?.data || !Array.isArray(response.data)) throw new Error("Respuesta inválida");
+    locations.value = response.data.map(municipio => ({
       name: municipio.nombre,
       lat: municipio.latitud,
       lng: municipio.longitud,
-    })));
+    }));
   } catch (error) {
     console.error("Error cargando municipios:", error);
   } finally {
@@ -43,25 +39,23 @@ const cargarMunicipios = async () => {
   }
 };
 
-//Función para mostrar arboles, haciendo 3 busquedas en paralelo
+// Cargar árboles y especies
 const cargarArboles = async () => {
   cargando.value = true;
   try {
-    const [arbolesResponse, arbolesPorMunicipioResponse, especiesPorMunicipioResponse] = await Promise.all([
+    const [arbolesResponse, especiesPorMunicipioResponse] = await Promise.allSettled([
       ArbolService.mostrarArboles(),
-      ArbolService.mostrarArbolesPorMunicipio(),
       ArbolService.mostrarEspeciesPorMunicipio(),
     ]);
-    if (!arbolesResponse || !arbolesResponse.data || 
-        !arbolesPorMunicipioResponse || !arbolesPorMunicipioResponse.data || 
-        !especiesPorMunicipioResponse || !especiesPorMunicipioResponse.data) {
-      throw new Error("Respuesta inválida al obtener árboles o especies.");
+
+    if (arbolesResponse.status === 'fulfilled' && especiesPorMunicipioResponse.status === 'fulfilled') {
+      arboles.value = [{
+        totalArboles: arbolesResponse.value?.data?.total_arboles || 0,
+        totalEspeciesPorMunicipio: especiesPorMunicipioResponse.value?.data?.total_especies_municipios || 0,
+      }];
+    } else {
+      console.error("Error al cargar los árboles o especies.");
     }
-    arboles.value = [{
-      totalArboles: arbolesResponse.data.total_arboles,
-      totalArbolesPorMunicipio: arbolesPorMunicipioResponse.data.total_arboles_municipio,
-      totalEspeciesPorMunicipio: especiesPorMunicipioResponse.data.total_especies_municipio
-    }];    
   } catch (error) {
     console.error("Error cargando árboles o especies:", error);
   } finally {
@@ -69,15 +63,12 @@ const cargarArboles = async () => {
   }
 };
 
-
-//Función para mostrar especies
+// Cargar especies
 const cargarEspecies = async () => {
   cargando.value = true;
   try {
     const response = await EspecieService.mostrarEspecies();
-    if (!response || !response.data) {
-      throw new Error("Respuesta inválida al obtener especies.");
-    }
+    if (!response?.data) throw new Error("Respuesta inválida");
     especies.value = [{
       totalEspecies: response.data.total_especies,
     }];
@@ -88,24 +79,24 @@ const cargarEspecies = async () => {
   }
 };
 
-
-
 const carousel = ref(null);
 const carouselItems = ref(null);
 
-//Movimiento de logos
+// Movimiento de carousel
 const moveCarousel = () => {
   if (carouselItems.value) {
     const firstItem = carouselItems.value.querySelector("img");
-    const itemWidth = firstItem.offsetWidth + 16; 
+    const itemWidth = firstItem?.offsetWidth + 16;
     const maxScroll = carouselItems.value.scrollWidth - carouselItems.value.offsetWidth;
-
-    const currentTranslate = parseFloat(getComputedStyle(carouselItems.value).transform.split(',')[4]) || 0;
+    
+    let currentTranslate = parseFloat(getComputedStyle(carouselItems.value).transform.split(',')[4]) || 0;
     if (Math.abs(currentTranslate) < maxScroll) {
-      carouselItems.value.style.transform = `translateX(${currentTranslate - itemWidth}px)`; 
+      currentTranslate -= itemWidth;
     } else {
-      carouselItems.value.style.transform = `translateX(0px)`;
+      currentTranslate = 0;
     }
+
+    carouselItems.value.style.transform = `translateX(${currentTranslate}px)`;
   }
 };
 </script>
@@ -138,7 +129,9 @@ const moveCarousel = () => {
       <div class=" md:w-5/6 xl:w-2/3 xl:flex-1 md:flex-1 md:order-2 h-full ">
         <GoogleMap 
         :center="mapCenter" 
-        :zoom="mapZoom" :locations="locations" 
+        :zoom="mapZoom" 
+        :locations="locations" 
+        :arboles="arboles"
         class="bottom-6 md:bottom-0 xl:bottom-0 md:right-3 rounded-2xl"
         />
       </div>

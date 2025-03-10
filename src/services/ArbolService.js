@@ -19,9 +19,6 @@ export default {
   mostrarArboles(){
     return api.get('/totalArboles')
   },
-  mostrarArbolesPorMunicipio(){
-    return api.get('/totalArbolesMunicipio')
-  },
   mostrarEspeciesPorMunicipio(){
     return api.get('/totalEspeciesPorMunicipio')
   }

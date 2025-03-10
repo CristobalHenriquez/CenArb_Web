@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -54,11 +54,23 @@ const handleMouseLeave = () => {
   hoveredIndex.value = null;
 };
 
+onMounted(() => {
+  setTimeout(() => {
+    if (carousel.value) setInitialScroll();
+  }, 100);
+  setTimeout(() => {
+}, 500);
+});
+
 watch(() => props.items, (newItems) => {
   if (newItems.length) {
     setTimeout(setInitialScroll, 500);
   }
 }, { deep: true, immediate: true });
+
+watch(() => props.initialDirection, () => {
+  setTimeout(setInitialScroll, 100);
+});
 </script>
 
 <template>
