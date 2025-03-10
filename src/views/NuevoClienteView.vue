@@ -15,13 +15,28 @@ defineProps({
 
 const handleSubmit = (data) => {
   data.estado = 1; // Define el estado como activo
+  // Asegúrate de enviar solo un rol
+  data.role = data.role.split(',')[0]; // Esto tomará solo el primer rol en caso de que haya una coma
   ClienteService.agregarCliente(data)
-  .then((respuesta) => {
-    console.log(respuesta);
-    router.push('/');
-  })
-  .catch((error) => console.log(error));
+    .then((respuesta) => {
+      console.log(respuesta);
+      router.push('/inicio');
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log('Error al agregar cliente - Respuesta del servidor:');
+        console.log('Datos de error:', error.response.data);
+        console.log('Código de estado:', error.response.status);
+        console.log('Encabezados:', error.response.headers);
+      } else if (error.request) {
+        console.log('No se recibió respuesta del servidor:', error.request);
+      } else {
+        console.log('Error en la solicitud:', error.message);
+      }
+    });
 };
+
+
 </script>
 
 <template>
@@ -63,8 +78,8 @@ const handleSubmit = (data) => {
         class="email-censista" />
         
         <FormKit type="select" label="Rol" name="role" placeholder="Selecciona el rol del censista" :options="[
-        { label: 'Relevador', value: 'relevador' },
-        { label: 'Técnico', value: 'tecnico' }
+        { label: 'Relevador', value: 'Relevador' },
+        { label: 'Técnico', value: 'Técnico' }
         ]" />
       </FormKit>
     </div>
