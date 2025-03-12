@@ -64,8 +64,9 @@ const handleLogin = async () => {
     const token = response.data.token;
     if (token) {
       localStorage.setItem('token', token);
-      isLoggedIn.value = true; 
+      isLoggedIn.value = true;
       router.push('/municipio'); 
+      window.dispatchEvent(new Event("storage"));
     }
   } catch (error) {
     console.error('Error al iniciar sesión:', error);

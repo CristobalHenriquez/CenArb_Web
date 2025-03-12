@@ -1,35 +1,46 @@
 <script setup>
-    import { onMounted, ref, computed } from 'vue';
-    import ClienteService from '@/services/ClienteService';
-    import RouterLink  from '../components/UI/RouterLink.vue';
-    import GoogleMap from '@/components/GoogleMap.vue';
+import { onMounted, ref } from 'vue';
+import ClienteService from '@/services/ClienteService';
+import AuthenticationService from '@/services/AuthenticationService';
+import RouterLink from '../components/UI/RouterLink.vue';
+import GoogleMap from '@/components/GoogleMap.vue';
+import Spinner from "@/components/Spinner.vue";
 
-    const clientes = ref([])
+const mapCenter = ref({ lat: 0, lng: 0 });
+const cargando = ref(true);
+const datos = ref({});
 
-    onMounted(() => {
-        ClienteService.obtenerClientes()
-            .then(({data}) => {
-                clientes.value = data
-            })
-            .catch(error => console.log('Hubo un error'))
-        })
+onMounted(() => {
+  cargarMunicipio();
+});
 
-    defineProps({
-        titulo:{
-        type: String
-        }
-    })
+const cargarMunicipio = async () => {
+  cargando.value = true;
+  try {
+    const response = await AuthenticationService.obtenerMunicipio();
+    if (!response?.data || !response.data.municipio) {
+      throw new Error("Respuesta inválida o municipio no encontrado");
+    }
+    datos.value = response.data.municipio;
+    mapCenter.value = { lat: datos.value.latitud / 1000000, lng: datos.value.longitud / 1000000 };
+  } catch (error) {
+    console.error("Error:", error);
+  } finally {
+    cargando.value = false;
+  }
+};
 
-
-    const mapCenter = { lat: -32.959648123706145, lng: -60.69087085480481 };
-    const mapZoom = 12;
+const mapZoom = 12;
 
 </script>
 
 <template>
   <!-- Primer cuadro -->
     <div class="w-full h-auto bg-white py-20">
-      <h1 class="font-semibold text-center text-5xl pb-16 text-[#042825]">Bienvenido municipio de Rosario</h1>
+      <h1 class="flex justify-center font-semibold text-center text-5xl pb-16 text-[#042825]">Bienvenido municipio de 
+      <span v-if="cargando" class="p-3"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
+      <span v-else class="pl-4">{{datos.nombre}}</span>
+      </h1>
       <div class="flex flex-col space-y-10 md:space-y-0 md:flex-row md:justify-center md:space-x-24 xl:space-x-40">
         <div class="flex flex-col items-center">
           <RouterLink to="inicio" class="md:px-10 bg-white border-[#042825] border-4 rounded-3xl">
@@ -60,7 +71,8 @@
 
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
-            <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500 K</p>
+            <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
+            <p v-else class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500 K</p>
             <p class="text-black text-lg xl:text-2xl">Árboles relevados</p>
           </div>
           <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
@@ -68,7 +80,8 @@
 
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
-            <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">290 T</p>
+            <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
+            <p v-else class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">290 T</p>
             <p class="text-black text-lg xl:text-2xl">Absorción de CO2 Aprox</p>
           </div>
           <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
@@ -76,7 +89,8 @@
 
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
-            <p class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">500</p>
+            <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
+            <p v-else class="font-bold text-2xl sm:text-3xl xl:text-4xl text-black">890</p>
             <p class="text-black text-lg xl:text-2xl">Especies de árboles</p>
           </div>
           <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
@@ -90,7 +104,7 @@
       <h1 class="font-semibold text-center text-5xl pb-16 text-[#042825]">Mapa interactivo</h1>
       <div class="flex justify-center">
         <div class="w-3/4 h-[550px] border-[#042825] border-8 rounded-3xl">
-          <GoogleMap :center="mapCenter" :zoom="mapZoom" :locations="locations" class="rounded-2xl" />
+        <GoogleMap :center="mapCenter" :zoom="mapZoom" :locations="locations" class="rounded-2xl" /> 
         </div>
     </div>
     </div>

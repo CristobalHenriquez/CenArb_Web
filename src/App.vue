@@ -17,6 +17,10 @@ const logout = () => {
 watchEffect(() => {
   isLoggedIn.value = !!localStorage.getItem("token");
 });
+
+window.addEventListener("storage", () => {
+  isLoggedIn.value = !!localStorage.getItem("token");
+});
 </script>
 
 <template>
