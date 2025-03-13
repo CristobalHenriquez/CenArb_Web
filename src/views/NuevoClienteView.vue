@@ -75,7 +75,7 @@ const handleSubmit = (data) => {
         
         <FormKit type="email" label="Email" name="email" placeholder="Email del censista" validation="required|email"
         :validation-messages="{ required: 'El email del censista es obligatorio', email: 'Coloca un email válido' }"
-        class="email-censista" />
+        outer-class="email-censista-container" />
         
         <FormKit type="select" label="Rol" name="role" placeholder="Selecciona el rol del censista" :options="[
         { label: 'Relevador', value: 'Relevador' },
@@ -88,6 +88,17 @@ const handleSubmit = (data) => {
 </template>
 
 <style scoped>
+/* Estilos específicos SOLO para el input de email del formulario "Agregar Censista" */
+:deep(.email-censista-container .formkit-input) {
+  border: 2px solid #fffff !important;
+  background-color: #f9fafb !important;
+  padding: 10px !important;
+  margin-left: 40px !important; /* Mueve el input a la izquierda */;
+  width: 92%;
+
+}
+
+
 /* Estilo del botón */
 .btn-volver {
   padding: 10px 20px;
