@@ -9,16 +9,17 @@ import Spinner from "@/components/Spinner.vue";
 
 const mapCenter = { lat: -40.691200, lng: -63.616672 };
 const mapZoom = 4;
-
+const cargandoArboles = ref(true);
+const cargandoEspecies = ref(true);
 const cargando = ref(true);
 const locations = ref([]);
 const arboles = ref([]);
 const especies = ref([]);
 
-onMounted(() => {
-  cargarMunicipios();
-  cargarArboles();
-  cargarEspecies();
+onMounted(async () => {
+  await cargarMunicipios();
+  await cargarArboles();
+  await cargarEspecies();
   setInterval(moveCarousel, 3000);
 });
 
@@ -40,9 +41,9 @@ const cargarMunicipios = async () => {
   }
 };
 
-// Cargar árboles y especies
+// Cargar árboles y especies, total y por municipio
 const cargarArboles = async () => {
-  cargando.value = true;
+  cargandoArboles.value = true;
   try {
     const [arbolesResponse, especiesPorMunicipioResponse] = await Promise.allSettled([
       ArbolService.mostrarArboles(),
@@ -52,7 +53,7 @@ const cargarArboles = async () => {
     if (arbolesResponse.status === 'fulfilled' && especiesPorMunicipioResponse.status === 'fulfilled') {
       arboles.value = [{
         totalArboles: arbolesResponse.value?.data?.total_arboles || 0,
-        totalEspeciesPorMunicipio: especiesPorMunicipioResponse.value?.data?.total_especies_municipios || 0,
+        totalDatosPorMunicipio: especiesPorMunicipioResponse.value?.data?.total_especies_municipios || 0,
       }];
     } else {
       console.error("Error al cargar los árboles o especies.");
@@ -60,13 +61,13 @@ const cargarArboles = async () => {
   } catch (error) {
     console.error("Error cargando árboles o especies:", error);
   } finally {
-    cargando.value = false;
+    cargandoArboles.value = false;
   }
 };
 
-// Cargar especies
+//Cargar especies
 const cargarEspecies = async () => {
-  cargando.value = true;
+  cargandoEspecies.value = true;
   try {
     const response = await EspecieService.mostrarEspecies();
     if (!response?.data) throw new Error("Respuesta inválida");
@@ -76,7 +77,7 @@ const cargarEspecies = async () => {
   } catch (error) {
     console.error("Error cargando especies:", error);
   } finally {
-    cargando.value = false;
+    cargandoEspecies.value = false;
   }
 };
 
@@ -112,7 +113,7 @@ const moveCarousel = () => {
         <div class="xl:pt-24 xl:pl-6 xl:pr-3 md:pt-24 md:pl-6">
           <h5 class="text-[#99a7a6] text-xl md:text-4xl xl:text-5xl font-extrabold opacity-70">Municipios</h5>
           <h3 class="text-white text-xl md:text-3xl xl:text-5xl font-semibold my-4">Somos 
-            <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
+            <span class="text-gray-300" v-if="cargando"><Spinner :size="'48'" :color="'gray-300'" :animate="true" /></span>
             <span v-else>{{ locations.length }}</span>
              municipios activos contra el cambio climático</h3>
         </div>
@@ -124,6 +125,7 @@ const moveCarousel = () => {
         :zoom="mapZoom" 
         :locations="locations" 
         :arboles="arboles"
+        :isMainView="true"
         class="bottom-6 md:bottom-0 xl:bottom-0 md:right-3 rounded-2xl"
         />
       </div>
@@ -134,8 +136,8 @@ const moveCarousel = () => {
     <div id="datos" class="flex flex-col mt-10 w-4/5 space-y-10 md:flex-row md:h-1/3 md:space-y-0 md:space-x-6 md:mt-10 md:justify-evenly xl:w-1/5 xl:h-[550px] xl:flex-col xl:justify-between xl:space-x-0 xl:mt-0 ">
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <Spinner v-if="cargando" :size="'36'" :color="'gray-300'" :animate="true" />
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles[0].totalArboles }} </p>
+          <span class="text-gray-300" v-if="cargandoArboles"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles[0]?.totalArboles }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Árboles relevados</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
@@ -143,7 +145,8 @@ const moveCarousel = () => {
 
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]">290 T</p>
+          <span class="text-gray-300" v-if="cargando"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else>290 T</p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Absorción de CO2 Aprox</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
@@ -151,8 +154,8 @@ const moveCarousel = () => {
 
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
-          <Spinner v-if="cargando" :size="'36'" :color="'gray-300'" :animate="true" />
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies[0].totalEspecies }} </p>
+          <span class="text-gray-300" v-if="cargandoEspecies"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies[0]?.totalEspecies }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Especies de árboles</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
@@ -226,22 +229,14 @@ const moveCarousel = () => {
   </div>
 
 
- <div id="fondo" class="w-full py-36 flex flex-col justify-evenly bg-[#042825]">
+ <div id="fondo" class="w-full py-28 flex flex-col justify-evenly bg-[#042825]">
   <div class="mb-20">
     <p class="text-center text-xl md:text-2xl xl:text-3xl text-white px-8 sm:px-20">
       Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad cumque aliquam excepturi temporibus, a repellendus quae labore. Hic, doloremque provident rem, quod accusamus accusantium eligendi ratione ullam ex repellat officiis?
     </p>
   </div>
-  <div class="flex flex-wrap justify-evenly items-center px-2 md:px-5 xl:px-44">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu1.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu2.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu3.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu4.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu5.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu6.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu7.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto mt-20" src="../components/icons/celu8.svg" alt="">
-  <img class="w-10 md:w-16 xl:w-24 mx-auto -mt-20" src="../components/icons/celu9.svg" alt="">
+  <div class="flex justify-center px-2 md:px-5 xl:px-44">
+  <img class="w-[90%] -mb-20 -mt-10 md:-mb-36 md:-mt-20 xl:-mb-44" src="../assets/img/ImgWEbMobile.svg" alt="App en Celulares">
 </div>
 
 </div>
