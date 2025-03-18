@@ -4,8 +4,10 @@ import { useRouter } from 'vue-router';
 import ClienteService from '@/services/ClienteService';
 import RouterLink from '../components/UI/RouterLink.vue';
 import Heading from '../components/UI/Heading.vue';
+import { useToast } from 'vue-toastification'; // Importar useToast
 
 const router = useRouter();
+const toast = useToast(); // Usar el hook de toast
 
 defineProps({
   titulo: {
@@ -15,8 +17,8 @@ defineProps({
 
 const handleSubmit = (data) => {
   data.estado = 1; // Define el estado como activo
-  // Asegúrate de enviar solo un rol
-  data.role = data.role.split(',')[0]; // Esto tomará solo el primer rol en caso de que haya una coma
+  data.role = data.role.split(',')[0]; // Solo toma el primer rol
+
   ClienteService.agregarCliente(data)
     .then((respuesta) => {
       console.log(respuesta);
@@ -28,6 +30,14 @@ const handleSubmit = (data) => {
         console.log('Datos de error:', error.response.data);
         console.log('Código de estado:', error.response.status);
         console.log('Encabezados:', error.response.headers);
+
+        // Mostrar el toast si las contraseñas no coinciden
+        if (error.response.data.password) {
+          toast.error('Las contraseñas no coinciden', {
+            position: 'top-right',  // Puedes cambiar la posición
+            timeout: 5000,  // Duración del toast
+          });
+        }
       } else if (error.request) {
         console.log('No se recibió respuesta del servidor:', error.request);
       } else {
@@ -35,9 +45,8 @@ const handleSubmit = (data) => {
       }
     });
 };
-
-
 </script>
+
 
 <template>
   <div class="min-h-screen bg-gray-100 mb-5">

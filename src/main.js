@@ -1,14 +1,20 @@
-import { createApp } from 'vue'
-import { plugin,defaultConfig } from '@formkit/vue'
-import config from '../Formkit.config'
-import App from './App.vue'
-import router from './router'
+import { createApp } from 'vue';
+import { plugin, defaultConfig } from '@formkit/vue';
+import config from '../Formkit.config';
+import App from './App.vue';
+import router from './router';
 
-import './assets/main.css'
+// Importar vue-toastification
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';  // Estilos de toast
 
-const app = createApp(App)
+import './assets/main.css';
 
-app.use(router)
-app.use(plugin, defaultConfig(config))
+const app = createApp(App);
 
-app.mount('#app')
+// Usar vue-toastification
+app.use(router);
+app.use(plugin, defaultConfig(config));  // Usar FormKit
+app.use(Toast);  // Usar el plugin de Toast
+
+app.mount('#app');
