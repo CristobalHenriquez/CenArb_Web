@@ -15,6 +15,7 @@ const cargando = ref(true);
 const locations = ref([]);
 const arboles = ref([]);
 const especies = ref([]);
+const arbolesCarousel = ref([]);
 
 onMounted(async () => {
   await cargarMunicipios();
@@ -55,6 +56,14 @@ const cargarArboles = async () => {
         totalArboles: arbolesResponse.value?.data?.total_arboles || 0,
         totalDatosPorMunicipio: especiesPorMunicipioResponse.value?.data?.total_especies_municipios || 0,
       }];
+
+      // Datos para el carrusel
+      arbolesCarousel.value = especiesPorMunicipioResponse.value?.data?.total_especies_municipios.map(municipio => ({
+        name: municipio.municipio,
+        prov: municipio.provincia,
+        totalArboles: municipio.totalArboles,
+        totalEspecies: municipio.totalEspecies
+      })) || [];
     } else {
       console.error("Error al cargar los árboles o especies.");
     }
@@ -199,7 +208,7 @@ const moveCarousel = () => {
 
     <!-- Primer Carrusel -->
     <Carousel 
-      :items="locations" 
+      :items="arbolesCarousel" 
       bgColor="#26473c" 
       hvColor="white"
       txColor="#92a29d"
@@ -210,7 +219,7 @@ const moveCarousel = () => {
 
     <!-- Segundo Carrusel -->
     <Carousel 
-      :items="locations" 
+      :items="arbolesCarousel" 
       bgColor="#aea646"
       hvColor="white"
       txColor="#6b6951"
