@@ -1,13 +1,16 @@
 <script setup>
-import { FormKit } from '@formkit/vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ClienteService from '@/services/ClienteService';
 import RouterLink from '../components/UI/RouterLink.vue';
 import Heading from '../components/UI/Heading.vue';
-import { useToast } from 'vue-toastification'; // Importar useToast
+import { useToast } from 'vue-toastification';
 
 const router = useRouter();
-const toast = useToast(); // Usar el hook de toast
+const toast = useToast();
+
+// Refs para mensajes de error en tiempo real
+const passwordError = ref('');
 
 defineProps({
   titulo: {
@@ -15,9 +18,44 @@ defineProps({
   },
 });
 
-const handleSubmit = (data) => {
-  data.estado = 1; // Define el estado como activo
-  data.role = data.role.split(',')[0]; // Solo toma el primer rol
+// Validar contraseña mientras escribe
+const validarPassword = (event) => {
+  const valor = event.target.value;
+  if (valor.length < 8) {
+    passwordError.value = 'La contraseña debe tener al menos 8 caracteres';
+  } else {
+    passwordError.value = '';
+  }
+};
+
+const validarNombre = (event) => {
+  const valor = event.target.value;
+  // Reemplaza cualquier número por vacío
+  event.target.value = valor.replace(/[0-9]/g, '');
+};
+
+
+const handleSubmit = (event) => {
+  event.preventDefault();
+  const form = event.target;
+  const data = {
+    name: form.name.value,
+    password: form.password.value,
+    password_confirmation: form.password_confirmation.value,
+    email: form.email.value,
+    role: form.role.value,
+    estado: 1,
+  };
+
+  if (data.password !== data.password_confirmation) {
+    toast.error('Las contraseñas no coinciden', {
+      position: 'top-right',
+      timeout: 5000,
+    });
+    return;
+  }
+
+  data.role = data.role.split(',')[0];
 
   ClienteService.agregarCliente(data)
     .then((respuesta) => {
@@ -26,16 +64,10 @@ const handleSubmit = (data) => {
     })
     .catch((error) => {
       if (error.response) {
-        console.log('Error al agregar cliente - Respuesta del servidor:');
-        console.log('Datos de error:', error.response.data);
-        console.log('Código de estado:', error.response.status);
-        console.log('Encabezados:', error.response.headers);
-
-        // Mostrar el toast si las contraseñas no coinciden
         if (error.response.data.password) {
           toast.error('Las contraseñas no coinciden', {
-            position: 'top-right',  // Puedes cambiar la posición
-            timeout: 5000,  // Duración del toast
+            position: 'top-right',
+            timeout: 5000,
           });
         }
       } else if (error.request) {
@@ -50,65 +82,75 @@ const handleSubmit = (data) => {
 
 <template>
   <div class="min-h-screen bg-gray-100 mb-5">
-    <!-- Botón para volver -->
     <div class="flex justify-end p-4">
       <RouterLink to="inicio" class="btn-volver">
         Volver
       </RouterLink>
     </div>
-    
-    <!-- Título -->
+
     <Heading class="titulo">
       {{ titulo }}
     </Heading>
-    
-    <!-- Contenedor del formulario -->
+
     <div class="formulario-container">
       <div class="formulario-content">
-        <FormKit type="form" submit-label="Agregar censista" incomplete-message="No se pudo enviar, revisa los mensajes"
-        @submit="handleSubmit" class="formulario">
-        <FormKit type="text" label="Nombre" name="name" placeholder="Nombre del censista" validation="required"
-        :validation-messages="{ required: 'El nombre del censista es obligatorio' }" />
-        
-        <FormKit type="password" label="Contraseña" name="password" placeholder="Contraseña"
-        validation="required|min:8" :validation-messages="{
-          required: 'La contraseña es obligatoria',
-          min: 'La contraseña debe tener al menos 8 caracteres'
-        }" />
-        
-        <FormKit type="password" label="Confirmar Contraseña" name="password_confirmation"
-        placeholder="Confirmar contraseña" validation="required|same:password" :validation-messages="{
-          required: 'La confirmación de la contraseña es obligatoria',
-          same: 'Las contraseñas no coinciden'
-        }" />
-        
-        <FormKit type="email" label="Email" name="email" placeholder="Email del censista" validation="required|email"
-        :validation-messages="{ required: 'El email del censista es obligatorio', email: 'Coloca un email válido' }"
-        outer-class="email-censista-container" />
-        
-        <FormKit type="select" label="Rol" name="role" placeholder="Selecciona el rol del censista" :options="[
-        { label: 'Relevador', value: 'Relevador' },
-        { label: 'Técnico', value: 'Técnico' }
-        ]" />
-      </FormKit>
+        <form @submit="handleSubmit" class="formulario">
+          <div class="campo">
+              <label for="name">Nombre</label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                placeholder="Nombre del censista" 
+                required 
+                @input="validarNombre" 
+              />
+          </div>
+
+
+          <div class="campo">
+            <label for="password">Contraseña</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Contraseña" 
+              required 
+              minlength="8"
+              @input="validarPassword" 
+            />
+            <p v-if="passwordError" class="error">{{ passwordError }}</p>
+          </div>
+
+
+          <div class="campo">
+            <label for="password_confirmation">Confirmar Contraseña</label>
+            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirmar contraseña" required />
+          </div>
+
+          <div class="campo email-censista-container">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Email del censista" required />
+          </div>
+
+          <div class="campo">
+            <label for="role">Rol</label>
+            <select id="role" name="role" required>
+              <option value="">Selecciona el rol del censista</option>
+              <option value="Relevador">Relevador</option>
+              <option value="Técnico">Técnico</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-submit">Agregar censista</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <style scoped>
-/* Estilos específicos SOLO para el input de email del formulario "Agregar Censista" */
-:deep(.email-censista-container .formkit-input) {
-  border: 2px solid #fffff !important;
-  background-color: #f9fafb !important;
-  padding: 10px !important;
-  margin-left: 40px !important; /* Mueve el input a la izquierda */;
-  width: 92%;
-
-}
-
-
-/* Estilo del botón */
+/* Botón volver */
 .btn-volver {
   padding: 10px 20px;
   font-size: 14px;
@@ -126,7 +168,7 @@ const handleSubmit = (data) => {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Estilo del título */
+/* Título */
 .titulo {
   text-align: center;
   font-size: 2rem;
@@ -145,13 +187,23 @@ const handleSubmit = (data) => {
   max-width: 600px;
 }
 
-/* Contenido interno del formulario */
 .formulario-content {
   padding: 2rem;
 }
 
-/* Estilos específicos para los campos FormKit */
-:deep(.formkit-input) {
+.campo {
+  margin-bottom: 20px;
+}
+
+.campo label {
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.campo input,
+.campo select {
   background-color: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -161,29 +213,15 @@ const handleSubmit = (data) => {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-:deep(.formkit-input:focus) {
+.campo input:focus,
+.campo select:focus {
   border-color: #3b82f6;
   box-shadow: 0px 0px 0px 3px rgba(59, 130, 246, 0.1);
   outline: none;
 }
 
-:deep(.formkit-label) {
-  font-weight: bold;
-  color: #374151;
-  margin-bottom: 8px;
-  display: block;
-}
-
-:deep(.formkit-message) {
-  text-align: center;
-  border-radius: 0%;
-  color: #f2e9e9;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-/* Estilo del botón de envío */
-:deep(.formkit-submit) {
+/* Botón enviar */
+.btn-submit {
   width: 100%;
   padding: 12px;
   font-size: 16px;
@@ -193,16 +231,12 @@ const handleSubmit = (data) => {
   border-radius: 8px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
 }
 
-:deep(.formkit-submit:hover) {
+.btn-submit:hover {
   background-color: #059669;
   transform: translateY(-1px);
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
-}
-
-/* Espaciado entre los campos */
-.formulario :deep(.formkit-wrapper) {
-  margin-bottom: 20px;
 }
 </style>
