@@ -96,36 +96,24 @@ const handleSubmit = (event) => {
       <div class="formulario-content">
         <form @submit="handleSubmit" class="formulario">
           <div class="campo">
-              <label for="name">Nombre</label>
-              <input 
-                type="text" 
-                id="name" 
-                name="name" 
-                placeholder="Nombre del censista" 
-                required 
-                @input="validarNombre" 
-              />
+            <label for="name">Nombre</label>
+            <input type="text" id="name" name="name" placeholder="Nombre del censista" required
+              @input="validarNombre" />
           </div>
 
 
           <div class="campo">
             <label for="password">Contraseña</label>
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              placeholder="Contraseña" 
-              required 
-              minlength="8"
-              @input="validarPassword" 
-            />
+            <input type="password" id="password" name="password" placeholder="Contraseña" required minlength="8"
+              @input="validarPassword" />
             <p v-if="passwordError" class="error">{{ passwordError }}</p>
           </div>
 
 
           <div class="campo">
             <label for="password_confirmation">Confirmar Contraseña</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirmar contraseña" required />
+            <input type="password" id="password_confirmation" name="password_confirmation"
+              placeholder="Confirmar contraseña" required />
           </div>
 
           <div class="campo email-censista-container">
