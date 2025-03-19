@@ -1,6 +1,9 @@
 import api from '../lib/axios';
 
 export default {
+  obtenerArbol() {
+    return api.get('/arbol')
+  },
   obtenerArboles(params) {
     return api.get('/arboles/filtrar', { params });  // Aquí se pasa `params` como parte de la solicitud
   },

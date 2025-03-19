@@ -34,22 +34,23 @@ const map = ref(null);
 const route = useRoute();
 const router = useRouter();
 let currentAlertContainer = null;
-let markerClusterer = null;  // Guardar la instancia de MarkerClusterer
+let markerClusterer = null;
 
-// Cargar la API de Google Maps de manera eficiente
 const loadGoogleMaps = async () => {
-  if (window.google) {
+  if (window.google && window.google.maps) {
     initMap();
-  } else {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&callback=initMap&libraries=visualization,places`;
-    script.async = true;
-    document.head.appendChild(script);
-    window.initMap = initMap;
+    return;
   }
+  if (document.querySelector("script[src*='maps.googleapis.com']")) return;
+
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&callback=initMap&libraries=visualization,places`;
+  script.async = true;
+  document.head.appendChild(script);
+  window.initMap = initMap;
 };
 
-// Iniciar el mapa
+
 const initMap = () => {
   if (!mapElement.value) return;
 
@@ -59,17 +60,21 @@ const initMap = () => {
     disableDefaultUI: true,
   });
 
-  // Solo inicializar MarkerClusterer una vez
+  // Inicializar MarkerClusterer
   markerClusterer = new MarkerClusterer({ map: map.value, markers: [] });
 
-  updateMarkers();  // Llamar para cargar los marcadores iniciales
+  updateMarkers();
 };
 
 // Actualizar los marcadores
 const updateMarkers = () => {
-  if (!map.value || !props.locations.length) return;
+  if (!map.value) return;
 
-  // Crear los nuevos marcadores
+  // Borrar marcadores existentes antes de agregar nuevos
+  markerClusterer.clearMarkers();
+
+  if (!props.locations.length) return;
+
   const markers = props.locations.map((location) => {
     const marker = new google.maps.Marker({
       position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
@@ -85,18 +90,18 @@ const updateMarkers = () => {
     return marker;
   });
 
-  // Si ya existe un MarkerClusterer, limpia los marcadores antiguos y agrega los nuevos
-  if (markerClusterer) {
-    markerClusterer.clearMarkers();
-    markerClusterer.addMarkers(markers);
-  }
+  markerClusterer.addMarkers(markers);
 };
 
 // Mostrar alerta
 const showAlert = (location) => {
+  if (!props.arboles.length) return;
+
   const municipioData = props.arboles[0];
-  const municipio = municipioData.totalDatosPorMunicipio.find((municipio) =>
-    municipio.municipio.trim().toLowerCase() === location.name.trim().toLowerCase()
+  if (!municipioData || !municipioData.totalDatosPorMunicipio) return;
+
+  const municipio = municipioData.totalDatosPorMunicipio.find(
+    (m) => m.municipio.trim().toLowerCase() === location.name.trim().toLowerCase()
   );
 
   const arboles = municipio ? municipio.totalArboles : 0;
@@ -106,7 +111,7 @@ const showAlert = (location) => {
   createAndDisplayAlert(location.name, arboles, co2, especies);
 };
 
-// Función para crear y mostrar una alerta
+// Crear y mostrar una alerta
 const createAndDisplayAlert = (nombre, arboles, co2, especies) => {
   if (currentAlertContainer) {
     render(null, currentAlertContainer);
@@ -134,7 +139,7 @@ watch([() => props.center, () => props.zoom, () => props.locations], () => {
   if (map.value) {
     map.value.setCenter(props.center);
     map.value.setZoom(props.zoom);
-    updateMarkers();  // Actualiza los marcadores si hay cambios
+    updateMarkers();
   }
 });
 
@@ -145,16 +150,21 @@ router.beforeEach((to, from, next) => {
     currentAlertContainer.remove();
     currentAlertContainer = null;
   }
-  next();  // Continuar con la navegación
+  next();
 });
 
 onMounted(loadGoogleMaps);
 
 onUnmounted(() => {
-  // Asegurarse de que se limpia todo si el componente se destruye
+  // Limpiar los marcadores y alertas al desmontar el componente
+  if (markerClusterer) {
+    markerClusterer.clearMarkers();
+    markerClusterer = null;
+  }
   if (currentAlertContainer) {
     render(null, currentAlertContainer);
     currentAlertContainer.remove();
+    currentAlertContainer = null;
   }
 });
 </script>

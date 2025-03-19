@@ -15,7 +15,8 @@ const cargando = ref(true);
 const locations = ref([]);
 const arboles = ref([]);
 const especies = ref([]);
-const arbolesCarousel = ref([]);
+const arbolesCarouselArriba = ref([]);
+const arbolesCarouselAbajo = ref([]);
 
 onMounted(async () => {
   await cargarMunicipios();
@@ -57,13 +58,43 @@ const cargarArboles = async () => {
         totalDatosPorMunicipio: especiesPorMunicipioResponse.value?.data?.total_especies_municipios || 0,
       }];
 
-      // Datos para el carrusel
-      arbolesCarousel.value = especiesPorMunicipioResponse.value?.data?.total_especies_municipios.map(municipio => ({
-        name: municipio.municipio,
-        prov: municipio.provincia,
-        totalArboles: municipio.totalArboles,
-        totalEspecies: municipio.totalEspecies
-      })) || [];
+      // Verifica si locations tiene datos antes de proceder
+      if (locations.value && locations.value.length > 0) {
+        const mitad = Math.ceil(locations.value.length / 2);
+        const primeraMitad = locations.value.slice(0, mitad);
+        const segundaMitad = locations.value.slice(mitad);
+
+        // Carrusel superior (primera mitad)
+        arbolesCarouselArriba.value = primeraMitad.map(municipio => {
+          const municipioConDatos = especiesPorMunicipioResponse.value?.data?.total_especies_municipios.find(
+            item => item.municipio === municipio.name
+          );
+
+          return {
+            name: municipio.name,
+            prov: municipioConDatos ? municipioConDatos.provincia : 'Desconocida',
+            totalArboles: municipioConDatos ? municipioConDatos.totalArboles : 0,
+            totalEspecies: municipioConDatos ? municipioConDatos.totalEspecies : 0,
+          };
+        }) || [];
+
+        // Carrusel inferior (segunda mitad)
+        arbolesCarouselAbajo.value = segundaMitad.map(municipio => {
+          const municipioConDatos = especiesPorMunicipioResponse.value?.data?.total_especies_municipios.find(
+            item => item.municipio === municipio.name
+          );
+
+          return {
+            name: municipio.name,
+            prov: municipioConDatos ? municipioConDatos.provincia : 'Desconocida',
+            totalArboles: municipioConDatos ? municipioConDatos.totalArboles : 0,
+            totalEspecies: municipioConDatos ? municipioConDatos.totalEspecies : 0,
+          };
+        }) || [];
+      } else {
+        console.error("No se encontraron municipios en locations.");
+      }
+
     } else {
       console.error("Error al cargar los árboles o especies.");
     }
@@ -73,6 +104,9 @@ const cargarArboles = async () => {
     cargandoArboles.value = false;
   }
 };
+
+
+
 
 //Cargar especies
 const cargarEspecies = async () => {
@@ -208,7 +242,7 @@ const moveCarousel = () => {
 
     <!-- Primer Carrusel -->
     <Carousel 
-      :items="arbolesCarousel" 
+      :items="arbolesCarouselArriba" 
       bgColor="#26473c" 
       hvColor="white"
       txColor="#92a29d"
@@ -219,7 +253,7 @@ const moveCarousel = () => {
 
     <!-- Segundo Carrusel -->
     <Carousel 
-      :items="arbolesCarousel" 
+      :items="arbolesCarouselAbajo" 
       bgColor="#aea646"
       hvColor="white"
       txColor="#6b6951"
@@ -231,24 +265,53 @@ const moveCarousel = () => {
 
   <div class="h-auto lg:h-3/4 flex flex-col lg:flex-row p-6 my-24 lg:p-10 justify-evenly items-center">
     <p class="text-xl md:text-2xl xl:text-3xl md:w-4/5 xl:w-1/2 lg:pr-8">
-      CenArb es una herramienta esencial para la gestión del arbolado urbano frente al cambio climático.
-      <br>Al permitir un registro detallado y actualizado de los árboles en los municipios, facilita el monitoreo de su estado de salud y ubicación, ayudando a tomar decisiones más informadas sobre su cuidado y conservación.
+      Al permitir un registro detallado y actualizado de los árboles en los municipios, facilita el monitoreo de su estado de salud y ubicación, ayudando a tomar decisiones más informadas sobre su cuidado y conservación.
       <br>A partir de esta App los municipios podrán optimizar la planificación urbana, fomentar la expansión de áreas verdes y mejorar la resiliencia frente a fenómenos climáticos extremos.    </p>
     <img class="mt-5 md:mt-8 w-full md:w-96 lg:w-1/3 xl:w-96 h-auto md:h-full object-cover rounded-2xl" src="/src/assets/img/smartphone.jpeg" alt="Smartphone">
   </div>
 
 
- <div id="fondo" class="w-full py-28 flex flex-col justify-evenly bg-[#042825]">
-  <div class="mb-20">
-    <p class="text-center text-xl md:text-2xl xl:text-3xl text-white px-8 sm:px-20">
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad cumque aliquam excepturi temporibus, a repellendus quae labore. Hic, doloremque provident rem, quod accusamus accusantium eligendi ratione ullam ex repellat officiis?
-    </p>
-  </div>
-  <div class="flex justify-center px-2 md:px-5 xl:px-44">
-  <img class="w-[90%] -mb-20 -mt-10 md:-mb-36 md:-mt-20 xl:-mb-44" src="../assets/img/ImgWEbMobile.svg" alt="App en Celulares">
+  <div class="w-full py-8 bg-[#042825]">
+    <div class="flex justify-center px-2 md:px-5 xl:px-44">
+      <img class="w-[90%]" src="../assets/img/ImgWEbMobile.svg" alt="App en Celulares">
+    </div>
+    <div class="text-center flex flex-col items-center mb-6 md:mb-16">
+      <h3 class="text-3xl md:text-4xl xl:text-5xl text-white font-semibold mb-6">
+        Así es CenArb
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-white text-lg md:text-2xl xl:text-3xl">
+        <ul class="space-y-4">
+          <li class="flex items-center gap-4">
+            <span class="bg-white p-2 rounded-full">
+              <i class="lucide lucide-tree text-white"></i>
+            </span>
+            Gestión de arbolado urbano
+          </li>
+          <li class="flex items-center gap-4">
+            <span class="bg-white p-2 rounded-full">
+              <i class="lucide lucide-clipboard-list text-white"></i>
+            </span>
+            Relevamiento detallado
+          </li>
+        </ul>
+        <ul class="space-y-4 -mt-2 md:mt-0">
+          <li class="flex items-center gap-4">
+            <span class="bg-white p-2 rounded-full">
+              <i class="lucide lucide-map-pin text-white"></i>
+            </span>
+            Geolocalización
+          </li>
+          <li class="flex items-center gap-4">
+            <span class="bg-white p-2 rounded-full">
+              <i class="lucide lucide-brain text-white"></i>
+            </span>
+            Optimizar la toma de decisiones
+          </li>
+        </ul>
+      </div>
+    </div>
 </div>
 
-</div>
 
 
 
