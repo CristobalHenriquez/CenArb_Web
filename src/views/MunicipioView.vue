@@ -13,113 +13,94 @@ const datos = ref({});
 const arbol = ref({});
 const coordenadas = ref([]);
 const mapZoom = 12;
-
 const clientes = ref([]);
 
 defineProps({
-    titulo: {
-        type: String
-    }
+  titulo: { type: String }
 });
 
 onMounted(async () => {
-    try {
-        const { data } = await ClienteService.obtenerClientes();
-        clientes.value = data;
-    } catch (error) {
-        console.error("Error al obtener clientes:", error);
-    }
+  try {
+    await obtenerClientes();
     await cargarMunicipio();
     await totalArboles();
     await coordenadasArboles();
+  } catch (error) {
+    console.error("Error al inicializar datos:", error);
+  }
 });
 
+const obtenerClientes = async () => {
+  try {
+    const { data } = await ClienteService.obtenerClientes();
+    clientes.value = data;
+  } catch (error) {
+    console.error("Error al obtener clientes:", error);
+  }
+};
+
+// Cargar municipio logueado
 const cargarMunicipio = async () => {
-    cargando.value = true;
-    try {
-        const response = await AuthenticationService.obtenerMunicipio();
-        if (!response?.data || !response.data.municipio) {
-            throw new Error("Respuesta inválida o municipio no encontrado");
-        }
-        datos.value = response.data.municipio;
-
-        mapCenter.value = {
-            lat: datos.value.latitud / 1000000,
-            lng: datos.value.longitud / 1000000
-        };
-    } catch (error) {
-        console.error("Error al cargar municipio:", error);
-    } finally {
-        cargando.value = false;
+  cargando.value = true;
+  try {
+    const response = await AuthenticationService.obtenerMunicipio();
+    if (response?.data?.municipio) {
+      datos.value = response.data.municipio;
+      mapCenter.value = {
+        lat: datos.value.latitud / 1000000,
+        lng: datos.value.longitud / 1000000
+      };
+    } else {
+      throw new Error("Municipio no encontrado");
     }
+  } catch (error) {
+    console.error("Error al cargar municipio:", error);
+  } finally {
+    cargando.value = false;
+  }
 };
 
+// CArgar árboles del municipio
 const totalArboles = async () => {
-    cargando.value = true;
-    try {
-        if (!datos.value || !datos.value.nombre) {
-            console.warn("Municipio no definido, no se puede buscar árboles.");
-            return;
-        }
-
-        const response = await ArbolService.mostrarEspeciesPorMunicipio();
-
-        if (!response?.data?.total_especies_municipios || !Array.isArray(response.data.total_especies_municipios)) {
-            console.warn("No se encontraron datos de árboles.");
-            arbol.value = { municipio: datos.value.nombre, totalArboles: 0, totalEspecies: 0 };
-            return;
-        }
-
-        const municipioData = response.data.total_especies_municipios.find(
-            item => item.municipio?.trim().toLowerCase() === datos.value.nombre?.trim().toLowerCase()
-        );
-
-        if (!municipioData) {
-            console.warn(`No hay datos de árboles para el municipio: ${datos.value.nombre}`);
-            arbol.value = { municipio: datos.value.nombre, totalArboles: 0, totalEspecies: 0 };
-            return;
-        }
-
-        arbol.value = {
-            totalArboles: municipioData.totalArboles,
-            totalEspecies: municipioData.totalEspecies
-        };
-    } catch (error) {
-        console.error("Error al cargar datos de árboles:", error);
-        arbol.value = { municipio: datos.value.nombre, totalArboles: 0, totalEspecies: 0 };
-    } finally {
-        cargando.value = false;
+  cargando.value = true;
+  try {
+    if (datos.value?.nombre) {
+      const response = await ArbolService.mostrarEspeciesPorMunicipio();
+      const municipioData = response?.data?.total_especies_municipios?.find(
+        item => item.municipio?.trim().toLowerCase() === datos.value.nombre?.trim().toLowerCase()
+      );
+      arbol.value = municipioData || { municipio: datos.value.nombre, totalArboles: 0, totalEspecies: 0 };
+    } else {
+      console.warn("Municipio no definido, no se puede buscar árboles.");
     }
+  } catch (error) {
+    console.error("Error al cargar datos de árboles:", error);
+    arbol.value = { municipio: datos.value.nombre, totalArboles: 0, totalEspecies: 0 };
+  } finally {
+    cargando.value = false;
+  }
 };
 
+// Traer las coordenadas de los árboles
 const coordenadasArboles = async () => {
-    cargando.value = true;
-    try {
-        if (!datos.value || !datos.value.id) {
-            console.warn("Municipio no definido, no se puede buscar árboles.");
-            return;
-        }
-
-        const response = await ArbolService.obtenerArbol();
-
-        if (!response?.data || !Array.isArray(response.data)) {
-            console.warn("No se encontraron datos de árboles.");
-            coordenadas.value = [];
-            return;
-        }
-        const arbolesFiltrados = response.data.filter(
-            arbol => arbol.id_municipio === datos.value.id
-        );
-        coordenadas.value = arbolesFiltrados.map(arbol => ({
-            lat: parseFloat(arbol.latitud) * 1000000,  // Multiplico por 1,000,000 porque en el componente GoogleMap tengo que dividir por esa cifra
-            lng: parseFloat(arbol.longitud) * 1000000 
-        }));
-    } catch (error) {
-        console.error("Error al cargar coordenadas de árboles:", error);
-        coordenadas.value = [];
-    } finally {
-        cargando.value = false;
+  cargando.value = true;
+  try {
+    if (datos.value?.id) {
+      const response = await ArbolService.obtenerArbol();
+      const arbolesFiltrados = response?.data?.filter(arbol => arbol.id_municipio === datos.value.id) || [];
+      coordenadas.value = arbolesFiltrados.map(arbol => ({
+        lat: parseFloat(arbol.latitud) * 1000000,
+        lng: parseFloat(arbol.longitud) * 1000000
+      }));
+    } else {
+      console.warn("Municipio no definido, no se pueden cargar las coordenadas.");
     }
+  } catch (error) {
+    console.error("Error al cargar coordenadas de árboles:", error);
+    coordenadas.value = [];
+  } finally {
+    cargando.value = false;
+  }
 };
 </script>
 

@@ -18,7 +18,7 @@ function closeAlert() {
 
 <template>
   <div v-if="showAlert" class="w-full h-1/2 flex justify-center">
-    <div class="fixed w-3/5 md:w-4/5 lg:w-9/12 xl:w-1/2 bottom-4 bg-[#042825] text-white px-4 pb-3 rounded-2xl shadow-lg space-y-4">
+    <div class="z-[9999] fixed w-3/5 md:w-4/5 lg:w-9/12 xl:w-1/2 bottom-4 bg-[#042825] text-white px-4 pb-3 rounded-2xl shadow-lg space-y-4">
       <button @click="closeAlert" class="absolute top-3 right-4 text-white text-3xl font-bold">&times;</button>
 
       <div class="flex w-3/4 md:w-full justify-center">

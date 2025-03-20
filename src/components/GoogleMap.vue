@@ -1,39 +1,21 @@
 <script setup>
-import { ref, onMounted, watch, createVNode, render, onUnmounted } from "vue";
+import { ref, onMounted, watch, onUnmounted } from "vue";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import { useRoute, useRouter } from "vue-router";
-import Alert from "./Alert.vue";
+import { useRoute } from "vue-router";
 
 const props = defineProps({
-  center: {
-    type: Object,
-    required: true,
-  },
-  zoom: {
-    type: Number,
-    required: true,
-  },
-  locations: {
-    type: Array,
-    required: false,
-    default: () => []
-  },
-  arboles: {
-    type: Array,
-    required: false,
-    default: () => []
-  },
-  isMainView: {
-    type: Boolean,
-    default: true,
-  }
+  center: { type: Object, required: true },
+  zoom: { type: Number, required: true },
+  locations: { type: Array, default: () => [] },
+  arboles: { type: Array, default: () => [] },
+  isMainView: { type: Boolean, default: true },
 });
+
+const emit = defineEmits(["showAlert"]);
 
 const mapElement = ref(null);
 const map = ref(null);
 const route = useRoute();
-const router = useRouter();
-let currentAlertContainer = null;
 let markerClusterer = null;
 
 const loadGoogleMaps = async () => {
@@ -50,7 +32,7 @@ const loadGoogleMaps = async () => {
   window.initMap = initMap;
 };
 
-
+// Inicia mapa
 const initMap = () => {
   if (!mapElement.value) return;
 
@@ -60,17 +42,15 @@ const initMap = () => {
     disableDefaultUI: true,
   });
 
-  // Inicializar MarkerClusterer
   markerClusterer = new MarkerClusterer({ map: map.value, markers: [] });
 
   updateMarkers();
 };
 
-// Actualizar los marcadores
+// Crea los markerClusterer
 const updateMarkers = () => {
   if (!map.value) return;
 
-  // Borrar marcadores existentes antes de agregar nuevos
   markerClusterer.clearMarkers();
 
   if (!props.locations.length) return;
@@ -83,7 +63,7 @@ const updateMarkers = () => {
 
     marker.addListener("click", () => {
       if (route.name === "home") {
-        showAlert(location);
+        handleMunicipioClick(location);
       }
     });
 
@@ -93,8 +73,8 @@ const updateMarkers = () => {
   markerClusterer.addMarkers(markers);
 };
 
-// Mostrar alerta
-const showAlert = (location) => {
+// Pasa los datos directamente al Alert cuando se hace click en un municipio
+const handleMunicipioClick = (location) => {
   if (!props.arboles.length) return;
 
   const municipioData = props.arboles[0];
@@ -104,37 +84,14 @@ const showAlert = (location) => {
     (m) => m.municipio.trim().toLowerCase() === location.name.trim().toLowerCase()
   );
 
-  const arboles = municipio ? municipio.totalArboles : 0;
-  const co2 = municipio ? municipio.co2 : 0;
-  const especies = municipio ? municipio.totalEspecies : 0;
-
-  createAndDisplayAlert(location.name, arboles, co2, especies);
+  emit("showAlert", {
+    name: location.name,
+    arboles: municipio ? municipio.totalArboles : 0,
+    co2: municipio ? municipio.co2 : 0,
+    totalEspecies: municipio ? municipio.totalEspecies : 0,
+  });
 };
 
-// Crear y mostrar una alerta
-const createAndDisplayAlert = (nombre, arboles, co2, especies) => {
-  if (currentAlertContainer) {
-    render(null, currentAlertContainer);
-    currentAlertContainer.remove();
-  }
-
-  const container = document.createElement("div");
-  document.body.appendChild(container);
-
-  const vnode = createVNode(Alert, { nombre, arboles, co2, especies });
-  render(vnode, container);
-  currentAlertContainer = container;
-
-  setTimeout(() => {
-    if (currentAlertContainer === container) {
-      render(null, container);
-      container.remove();
-      currentAlertContainer = null;
-    }
-  }, 5000);
-};
-
-// Ver cambios para actualizar el mapa
 watch([() => props.center, () => props.zoom, () => props.locations], () => {
   if (map.value) {
     map.value.setCenter(props.center);
@@ -143,28 +100,12 @@ watch([() => props.center, () => props.zoom, () => props.locations], () => {
   }
 });
 
-// Escuchar el cambio de ruta para eliminar la alerta
-router.beforeEach((to, from, next) => {
-  if (currentAlertContainer) {
-    render(null, currentAlertContainer);
-    currentAlertContainer.remove();
-    currentAlertContainer = null;
-  }
-  next();
-});
-
 onMounted(loadGoogleMaps);
 
 onUnmounted(() => {
-  // Limpiar los marcadores y alertas al desmontar el componente
   if (markerClusterer) {
     markerClusterer.clearMarkers();
     markerClusterer = null;
-  }
-  if (currentAlertContainer) {
-    render(null, currentAlertContainer);
-    currentAlertContainer.remove();
-    currentAlertContainer = null;
   }
 });
 </script>

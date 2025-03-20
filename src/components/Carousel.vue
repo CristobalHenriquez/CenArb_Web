@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -13,78 +13,97 @@ const props = defineProps({
 });
 
 const carousel = ref(null);
-const isDragging = ref(false);
-const startX = ref(0);
-const scrollLeft = ref(0);
 const hoveredIndex = ref(null);
+let scrollInterval = null;
 
+// Pasa los datos directamente al Alert
+const emit = defineEmits(['showAlert']);
 
+const handleClick = (item) => {
+  emit('showAlert', {
+    name: item.name,
+    arboles: item.totalArboles,
+    co2: item.co2,
+    totalEspecies: item.totalEspecies,
+  });
+};
+
+// Inicializar el desplazamiento del carrusel
 const setInitialScroll = () => {
   if (!carousel.value) return;
-  if (props.initialDirection === 'right') {
-    carousel.value.scrollLeft = carousel.value.scrollWidth - carousel.value.clientWidth;
-  } else {
-    carousel.value.scrollLeft = 0;
+  const scrollDirection = props.initialDirection === 'right' ? carousel.value.scrollWidth - carousel.value.clientWidth : 0;
+  carousel.value.scrollLeft = scrollDirection;
+};
+
+// Iniciar el desplazamiento automático
+const startAutoScroll = () => {
+  if (!carousel.value) return;
+
+  stopAutoScroll();
+
+  const direction = props.initialDirection === 'right' ? -1 : 1;
+  const speed = 1;
+
+  scrollInterval = setInterval(() => {
+    if (!carousel.value) return;
+
+    carousel.value.scrollLeft += speed * direction;
+
+    if (direction === 1 && carousel.value.scrollLeft >= carousel.value.scrollWidth - carousel.value.clientWidth) {
+      carousel.value.scrollLeft = 0;
+    }
+    if (direction === -1 && carousel.value.scrollLeft <= 0) {
+      carousel.value.scrollLeft = carousel.value.scrollWidth - carousel.value.clientWidth;
+    }
+  }, 12);  // Intervalo de actualización
+};
+
+// Detener el desplazamiento automático
+const stopAutoScroll = () => {
+  if (scrollInterval) {
+    clearInterval(scrollInterval);
+    scrollInterval = null;
   }
 };
 
-
-const startDrag = (e) => {
-  isDragging.value = true;
-  startX.value = e.pageX - carousel.value.offsetLeft;
-  scrollLeft.value = carousel.value.scrollLeft;
-};
-
-const onDrag = (e) => {
-  if (!isDragging.value) return;
-  const x = e.pageX - carousel.value.offsetLeft;
-  const walk = (x - startX.value) * 2;
-  carousel.value.scrollLeft = scrollLeft.value - walk;
-};
-
-const stopDrag = () => {
-  isDragging.value = false;
-};
-
+// Manejo de interacción con el carrusel
 const handleMouseEnter = (index) => {
   hoveredIndex.value = index;
+  stopAutoScroll();
 };
 
 const handleMouseLeave = () => {
   hoveredIndex.value = null;
+  startAutoScroll();
 };
 
+// Inicialización del carrusel cuando el componente se monta
 onMounted(() => {
-  setTimeout(() => {
-    if (carousel.value) setInitialScroll();
-  }, 100);
-  setTimeout(() => {
-}, 500);
+  setInitialScroll();
+  startAutoScroll();
 });
 
-watch(() => props.items, (newItems) => {
-  if (newItems.length) {
-    setTimeout(setInitialScroll, 500);
-  }
-}, { deep: true, immediate: true });
-
-watch(() => props.initialDirection, () => {
-  setTimeout(setInitialScroll, 100);
+// Detener el desplazamiento al desmontar el componente
+onUnmounted(() => {
+  stopAutoScroll();
 });
+
+// Reaccionar a cambios en `props.items` y `props.initialDirection`
+watch([() => props.items, () => props.initialDirection], () => {
+  setInitialScroll();
+  startAutoScroll();
+}, { immediate: true });
+
 </script>
 
 <template>
   <div 
     ref="carousel" 
     class="flex overflow-x-scroll scroll-snap-x snap-mandatory scrollbar-hide space-x-10 p-4 w-full"
-    @mousedown="startDrag($event)" 
-    @mousemove="onDrag($event)" 
-    @mouseup="stopDrag" 
-    @mouseleave="stopDrag"
   >
     <div 
       v-for="(item, index) in items" 
-      :key="index"
+      :key="item.id"
       :style="{ 
         backgroundColor: hoveredIndex === index ? hvColor : bgColor,
         userSelect: 'none' 
@@ -92,6 +111,7 @@ watch(() => props.initialDirection, () => {
       class="flex-shrink-0 w-auto h-36 rounded-3xl shadow-inner-top flex flex-col justify-center snap-start"
       @mouseenter="handleMouseEnter(index)"
       @mouseleave="handleMouseLeave"
+      @click="handleClick(item)"
     >
       <div class="w-auto px-5">
         <h5 class="text-2xl md:text-3xl xl:text-4xl font-bold" :style="{ textAlign: txAlign, color: hoveredIndex === index ? hvTxColor : color }">{{ item.totalArboles }}</h5>
