@@ -57,6 +57,7 @@ const cargarMunicipios = async () => {
     if (!response?.data || !Array.isArray(response.data)) throw new Error("Respuesta inválida");
     locations.value = response.data.map(municipio => ({
       name: municipio.nombre,
+      provincia: municipio.provincia.nombre,
       lat: municipio.latitud,
       lng: municipio.longitud,
     }));
@@ -97,7 +98,7 @@ const cargarArboles = async () => {
         const municipioConDatos = municipioIndice[municipio.name] || {};
         return {
           name: municipio.name,
-          prov: municipioConDatos.provincia || 'Desconocida',
+          prov: municipio.provincia || 'Desconocida',
           totalArboles: municipioConDatos.totalArboles || 0,
           totalEspecies: municipioConDatos.totalEspecies || 0,
         };
