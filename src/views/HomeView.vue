@@ -68,6 +68,16 @@ const cargarMunicipios = async () => {
   }
 };
 
+const formatearCO2 = (valor) => {
+  if (valor < 1) {
+    return `${(valor * 1000).toFixed(3)} G`; 
+  } else if (valor < 1000) {
+    return `${valor.toFixed(3)} KG`; 
+  } else {
+    return `${(valor / 1000).toFixed(3)} T`; 
+  }
+};
+
 const cargarArboles = async () => {
   cargandoArboles.value = true;
   try {
@@ -79,11 +89,15 @@ const cargarArboles = async () => {
     if (!arbolesResponse?.data || !especiesPorMunicipioResponse?.data) {
       throw new Error("Datos incompletos o erróneos.");
     }
-
+    const totalArboles = arbolesResponse.data.total_arboles || 0;
+    const co2Absorbido = totalArboles * 0.0446292;
+    
+    // Guardar los datos
     arboles.value = [{
-      totalArboles: arbolesResponse.data.total_arboles || 0,
-      totalDatosPorMunicipio: especiesPorMunicipioResponse.data.total_especies_municipios || 0,
-    }];
+      totalArboles,
+      totalDatosPorMunicipio: especiesPorMunicipioResponse.data.total_especies_municipios || [],
+      co2Absorbido: formatearCO2(co2Absorbido)
+    }]; 
 
     if (locations.value.length > 0) {
       const mitad = Math.ceil(locations.value.length / 2);
@@ -95,14 +109,18 @@ const cargarArboles = async () => {
 
       // Mapear un municipio a sus datos correspondientes
       const mapearMunicipio = (municipio) => {
-        const municipioConDatos = municipioIndice[municipio.name] || {};
-        return {
-          name: municipio.name,
-          prov: municipio.provincia || 'Desconocida',
-          totalArboles: municipioConDatos.totalArboles || 0,
-          totalEspecies: municipioConDatos.totalEspecies || 0,
-        };
+      const municipioConDatos = municipioIndice[municipio.name] || {};
+      const totalArboles = municipioConDatos.totalArboles || 0;
+      const co2AbsorbidoMunicipio = totalArboles * 0.0446292;
+
+      return {
+        name: municipio.name,
+        prov: municipio.provincia || 'Desconocida',
+        totalArboles,
+        totalEspecies: municipioConDatos.totalEspecies || 0,
+        co2Absorbido: formatearCO2(co2AbsorbidoMunicipio),
       };
+    };
 
       // Dividir y mapear municipios para el carrusel
       arbolesCarouselArriba.value = locations.value.slice(0, mitad).map(mapearMunicipio);
@@ -116,7 +134,6 @@ const cargarArboles = async () => {
     cargandoArboles.value = false;
   }
 };
-
 
 const cargarEspecies = async () => {
   cargandoEspecies.value = true;
@@ -199,7 +216,7 @@ const handleItemClick = (item) => {
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
           <span class="text-gray-300" v-if="cargando"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else>290 T</p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else>{{ arboles[0]?.co2Absorbido }}</p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Absorción de CO2 Aprox</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">

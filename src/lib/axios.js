@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://desarrollo.cenarb.net/api",
+  baseURL: "https://desarrollo.cenarb.net/api",
 });
 
 api.interceptors.request.use(

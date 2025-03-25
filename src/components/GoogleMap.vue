@@ -18,6 +18,16 @@ const map = ref(null);
 const route = useRoute();
 let markerClusterer = null;
 
+const formatearCO2 = (valor) => {
+  if (valor < 1) {
+    return `${(valor * 1000).toFixed(4)} G`;
+  } else if (valor < 1000) {
+    return `${valor.toFixed(4)} KG`;
+  } else {
+    return `${(valor / 1000).toFixed(4)} T`;
+  }
+};
+
 const loadGoogleMaps = async () => {
   if (window.google && window.google.maps) {
     initMap();
@@ -84,10 +94,16 @@ const handleMunicipioClick = (location) => {
     (m) => m.municipio.trim().toLowerCase() === location.name.trim().toLowerCase()
   );
 
+  const co2Absorbido = municipio && municipio.co2Absorbido !== undefined
+    ? municipio.co2Absorbido
+    : (municipio?.totalArboles || 0) * 0.0446292;
+
+    const co2Formateado = formatearCO2(co2Absorbido);
+
   emit("showAlert", {
     name: location.name,
     arboles: municipio ? municipio.totalArboles : 0,
-    co2: municipio ? municipio.co2 : 0,
+    co2: co2Formateado || 0,
     totalEspecies: municipio ? municipio.totalEspecies : 0,
   });
 };

@@ -4,7 +4,7 @@ import { ref } from "vue";
 const props = defineProps({
   nombre: String,
   arboles: Number,
-  co2: Number,
+  co2: String,
   especies: Number,
 });
 

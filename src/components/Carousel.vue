@@ -23,12 +23,12 @@ const handleClick = (item) => {
   emit('showAlert', {
     name: item.name,
     arboles: item.totalArboles,
-    co2: item.co2,
+    co2: item.co2Absorbido,
     totalEspecies: item.totalEspecies,
   });
 };
 
-// Inicializar el desplazamiento del carrusel
+// Iniciar el desplazamiento del carrusel
 const setInitialScroll = () => {
   if (!carousel.value) return;
   const scrollDirection = props.initialDirection === 'right' ? carousel.value.scrollWidth - carousel.value.clientWidth : 0;
