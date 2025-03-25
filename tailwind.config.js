@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xl-custom': '1920px',
+      },
       boxShadow: {
         'inner-top': 'inset 0 5px 5px rgba(0, 0, 0, 0.2)',
         'bottom': '0 3px 5px rgba(0, 0, 0, 0.2)',

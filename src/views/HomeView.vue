@@ -70,11 +70,11 @@ const cargarMunicipios = async () => {
 
 const formatearCO2 = (valor) => {
   if (valor < 1) {
-    return `${(valor * 1000).toFixed(3)} G`; 
+    return `${(valor * 1000).toFixed(1)} G`; 
   } else if (valor < 1000) {
-    return `${valor.toFixed(3)} KG`; 
+    return `${valor.toFixed(1)} KG`; 
   } else {
-    return `${(valor / 1000).toFixed(3)} T`; 
+    return `${(valor / 1000).toFixed(1)} T`; 
   }
 };
 
@@ -148,22 +148,6 @@ const cargarEspecies = async () => {
   }
 };
 
-const carouselItems = ref(null);
-
-let currentTranslate = 0;
-
-const moveCarousel = () => {
-  if (carouselItems.value) {
-    const firstItem = carouselItems.value.querySelector("img");
-    if (!firstItem) return;
- 
-    const itemWidth = firstItem.offsetWidth + 16;
-    const maxScroll = carouselItems.value.scrollWidth - carouselItems.value.offsetWidth;
- 
-    currentTranslate = Math.abs(currentTranslate) < maxScroll ? currentTranslate - itemWidth : 0;
-    carouselItems.value.style.transform = `translateX(${currentTranslate}px)`;
-  }
-};
 
 const handleItemClick = (item) => {
   showAlert(item);
@@ -207,7 +191,7 @@ const handleItemClick = (item) => {
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
           <span class="text-gray-300" v-if="cargandoArboles"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ arboles[0]?.totalArboles }} </p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-3xl text-[#042825]" v-else> {{ arboles[0]?.totalArboles }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Árboles relevados</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
@@ -216,7 +200,7 @@ const handleItemClick = (item) => {
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
           <span class="text-gray-300" v-if="cargando"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else>{{ arboles[0]?.co2Absorbido }}</p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-3xl text-[#042825]" v-else>{{ arboles[0]?.co2Absorbido }}</p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Absorción de CO2 Aprox</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
@@ -225,7 +209,7 @@ const handleItemClick = (item) => {
       <div class="w-full h-28 sm:h-32 xl:h-40 bg-[#afc199] rounded-2xl p-4 flex items-center shadow-inner-top">
         <div class="flex flex-col">
           <span class="text-gray-300" v-if="cargandoEspecies"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
-          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-4xl text-[#042825]" v-else> {{ especies[0]?.totalEspecies }} </p>
+          <p class="font-bold text-2xl sm:text-3xl md:text-2xl xl:text-3xl text-[#042825]" v-else> {{ especies[0]?.totalEspecies }} </p>
           <p class="text-[#042825] font-medium text-sm sm:text-base xl:text-2xl">Especies de árboles</p>
         </div>
         <img class="w-20 xl:w-28 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
@@ -234,29 +218,16 @@ const handleItemClick = (item) => {
   </div>
 
   <!-- Logos de socios -->
-  <div id="socios" class="pt-10 pb-36 flex flex-col justify-evenly items-center xl:px-[10%] xl:flex-row">
-    <h2 class="text-xl md:text-2xl text-center xl:text-start xl:pr-5 py-5 mb-4"> 
+  <div id="socios" class="pt-10 pb-36 flex flex-col justify-between items-center xl:pr-[10%] xl:pl-[13%] xl-custom:pl-[12%] xl:flex-row">
+    <h2 class="text-xl md:text-2xl text-center xl:text-start py-5 mb-4"> 
       <!--centrado a la izquierda -->
-      socios comprometidos <br>
-      con el cambio climático
+      organizaciones aliadas
+      <br> frente al cambio climático
     </h2>
-    <div
-      ref="carousel"
-      class="flex items-center justify-end xl:w-9/12 overflow-hidden relative"
-    >
-      <div
-        class="flex transition-all duration-300 ease-in-out space-x-10"
-        ref="carouselItems"
-      >
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Logo Alpa Nuevo (Negro).svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Recurso 39.svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Signify.svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/EUROCLIMA_horizontal ES 1.svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Logo Alpa Nuevo (Negro).svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Recurso 39.svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/Signify.svg" alt="socios" />
-      <img class="h-12 xl:h-16 md:w-44 xl:w-64 object-contain" src="../components/icons/logosSocios/EUROCLIMA_horizontal ES 1.svg" alt="socios" />
-      </div>
+    <div class="flex items-center justify-end xl:w-9/12 xl:space-x-8 xl-custom:space-x-10">
+    <img class="h-12 md:h-16 xl:h-20 w-32 md:w-52 xl:w-64 xl-custom:w-80 object-contain" src="../components/icons/logosSocios/Ramcc.svg" alt="socios" />
+    <img class="h-12 md:h-16 xl:h-20 w-32 md:w-52 xl:w-64 xl-custom:w-80 object-contain" src="../components/icons/logosSocios/FesR.svg" alt="socios" />
+    <img class="h-12 md:h-16 xl:h-20 w-32 md:w-52 xl:w-64 xl-custom:w-80 object-contain" src="../components/icons/logosSocios/CenArbN.svg" alt="socios" />
     </div>
   </div>
   
