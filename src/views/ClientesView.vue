@@ -7,28 +7,27 @@ import Cliente from '../components/Cliente.vue';
 
 const clientes = ref([]);
 
+// Paginación
+const paginaActual = ref(1);
+const clientesPorPagina = ref(10); // Número de clientes por página
+
 // Obtener el rol del usuario desde el localStorage o valor predeterminado
 const getUserRole = () => {
-  return localStorage.getItem('user_role') || 'relevador'; // Si no se encuentra el rol, por defecto "relevador"
+  return localStorage.getItem('user_role') || 'relevador';
 };
 
 onMounted(() => {
-  // Obtener el rol del usuario
   const role = getUserRole();
 
   ClienteService.obtenerClientes(role)
     .then(({ data }) => {
       console.log("Datos obtenidos de la API:", data);
 
-      // Verifica si la respuesta es un arreglo o un objeto único
       if (Array.isArray(data)) {
-        // Si es un arreglo, filtra los usuarios con rol "Relevador" o "Técnico"
         clientes.value = data.filter(user => user.role === 'Relevador' || user.role === 'Técnico');
       } else if (data && data.role) {
-        // Si es un único objeto, ponlo dentro de un arreglo
         clientes.value = [data].filter(user => user.role === 'Relevador' || user.role === 'Técnico');
       } else {
-        // Si no es ni un arreglo ni un objeto con propiedad 'role', muestra un mensaje de error
         clientes.value = [];
         console.log("No se encontraron usuarios con el rol adecuado.");
       }
@@ -38,7 +37,6 @@ onMounted(() => {
     });
 });
 
-
 // Propiedades para el título (si es necesario)
 defineProps({
   titulo: {
@@ -46,13 +44,28 @@ defineProps({
   }
 });
 
-const existenClientes = computed(() => {
-  return clientes.value.length > 0;
+// Computed para determinar si hay clientes
+const existenClientes = computed(() => clientes.value.length > 0);
+
+// Paginación
+const totalPaginas = computed(() => Math.ceil(clientes.value.length / clientesPorPagina.value));
+
+const clientesPaginados = computed(() => {
+  const inicio = (paginaActual.value - 1) * clientesPorPagina.value;
+  return clientes.value.slice(inicio, inicio + clientesPorPagina.value);
 });
+
+const paginaAnterior = () => {
+  if (paginaActual.value > 1) paginaActual.value--;
+};
+
+const paginaSiguiente = () => {
+  if (paginaActual.value < totalPaginas.value) paginaActual.value++;
+};
 
 // Actualizar el estado del cliente
 const actualizarEstado = ({ id, estado }) => {
-  const role = getUserRole(); // Obtener rol para cada solicitud
+  const role = getUserRole();
   ClienteService.cambiarEstado(id, { estado: !estado }, role)
     .then(() => {
       const i = clientes.value.findIndex(cliente => cliente.id === id);
@@ -63,7 +76,7 @@ const actualizarEstado = ({ id, estado }) => {
 
 // Eliminar un cliente
 const eliminarCliente = id => {
-  const role = getUserRole(); // Obtener rol para cada solicitud
+  const role = getUserRole();
   ClienteService.eliminarCliente(id, role)
     .then(() => {
       clientes.value = clientes.value.filter(cliente => cliente.id !== id);
@@ -110,17 +123,30 @@ const eliminarCliente = id => {
             </thead>
             <tbody class="divide-y divide-gray-200 bg-gray-50">
               <Cliente 
-                      v-for="cliente in clientes" 
-                      :key="cliente.id" 
-                      :cliente="cliente"
-                      class="hover:bg-green-200 transition-all duration-200 ease-in-out transform hover:scale-101 hover:shadow-md text-gray-700"
-                      @actualizar-estado="actualizarEstado"
-                      @eliminar-cliente="eliminarCliente"
-                    />
+                v-for="cliente in clientesPaginados" 
+                :key="cliente.id" 
+                :cliente="cliente"
+                class="hover:bg-green-200 transition-all duration-200 ease-in-out transform hover:scale-101 hover:shadow-md text-gray-700"
+                @actualizar-estado="actualizarEstado"
+                @eliminar-cliente="eliminarCliente"
+              />
             </tbody>
           </table>
         </div>
       </div>
+    </div>
+
+    <!-- Paginación -->
+    <div v-if="existenClientes" class="flex justify-between items-center mt-4 px-5">
+      <button @click="paginaAnterior" :disabled="paginaActual === 1"
+        class="px-3 py-1 bg-gray-300 rounded disabled:opacity-50">
+        Anterior
+      </button>
+      <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+      <button @click="paginaSiguiente" :disabled="paginaActual === totalPaginas"
+        class="px-3 py-1 bg-gray-300 rounded disabled:opacity-50">
+        Siguiente
+      </button>
     </div>
 
     <p v-else class="text-center text-gray-600 mt-5">No hay clientes</p>
