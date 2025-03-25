@@ -52,9 +52,50 @@ const initMap = () => {
     disableDefaultUI: true,
   });
 
-  markerClusterer = new MarkerClusterer({ map: map.value, markers: [] });
+  markerClusterer = new MarkerClusterer({
+    map: map.value,
+    markers: [],
+    renderer: {
+      render: ({ count, position }) => {
+        return new google.maps.Marker({
+          position,
+          icon: {
+            url: getClusterIcon(count),
+            scaledSize: new google.maps.Size(50, 50),
+          },
+          label: {
+            text: count.toString(),
+            color: "#fff",
+            fontSize: "14px",
+            fontWeight: "bold",
+          },
+        });
+      },
+    },
+  });
 
   updateMarkers();
+};
+
+// Función para definir el color de los clusters
+const getClusterIcon = (count) => {
+  const color = count > 50 ? "#26473c" : count > 15 ? "#aea646" : "#72aa27" ; // Verde oscuro, mostaza o verde claro según cantidad
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+      <circle cx="40" cy="40" r="25" fill="${color}"/>
+      <text x="50%" y="50%" font-size="24" font-weight="bold" text-anchor="middle" fill="white" dy=".3em">${count}</text>
+    </svg>`;
+
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+};
+
+const getCustomMarkerIcon = () => {
+  return {
+    url: "src/components/icons/marker-svgrepo-com.svg", // Asegúrate de que la ruta sea correcta
+    scaledSize: new google.maps.Size(30, 30), // Ajusta el tamaño según sea necesario
+    anchor: new google.maps.Point(20, 40), // Ajusta el ancla para centrar el marcador
+  };
 };
 
 // Crea los markerClusterer
@@ -66,19 +107,20 @@ const updateMarkers = () => {
   if (!props.locations.length) return;
 
   const markers = props.locations.map((location) => {
-    const marker = new google.maps.Marker({
-      position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
-      title: location.name,
-    });
-
-    marker.addListener("click", () => {
-      if (route.name === "home") {
-        handleMunicipioClick(location);
-      }
-    });
-
-    return marker;
+  const marker = new google.maps.Marker({
+    position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
+    title: location.name,
+    icon: getCustomMarkerIcon(), // Usando el SVG personalizado
   });
+
+  marker.addListener("click", () => {
+    if (route.name === "home") {
+      handleMunicipioClick(location);
+    }
+  });
+
+  return marker;
+});
 
   markerClusterer.addMarkers(markers);
 };
