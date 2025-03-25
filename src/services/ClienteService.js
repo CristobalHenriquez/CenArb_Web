@@ -15,7 +15,7 @@ const getAuthToken = (userRole) => {
 export default {
   // Obtener todos los usuarios
   obtenerClientes(userRole) {
-    return api.get(`/getRelevadorTecnico/`, {
+    return api.get(`/getRelevadorTecnico`, {
       headers: {
         Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
       }
