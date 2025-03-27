@@ -1,5 +1,6 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router";
+import AuthenticationService from "./services/AuthenticationService";
 import { ref, watchEffect } from "vue";
 
 const route = useRoute();
@@ -7,10 +8,15 @@ const router = useRouter();
 
 const isLoggedIn = ref(!!localStorage.getItem("token"));
 
-const logout = () => {
-  localStorage.removeItem("token");
-  isLoggedIn.value = false;
-  router.push("/");
+const logout = async () => {
+  try {
+    await AuthenticationService.salir();
+    localStorage.removeItem("token");
+    isLoggedIn.value = false;
+    router.push("/");
+  } catch (error) {
+    console.error("Error al cerrar sesión", error);
+  }
 };
 
 

@@ -25,7 +25,6 @@ onMounted(async () => {
   await cargarMunicipios();
   await cargarArboles();
   await cargarEspecies();
-  setInterval(moveCarousel, 3000);
 });
 
 const showAlert = (data) => {

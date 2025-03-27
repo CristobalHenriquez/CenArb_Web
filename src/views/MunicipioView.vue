@@ -109,7 +109,6 @@ const coordenadasArboles = async () => {
         lat: parseFloat(arbol.latitud) * 1000000,
         lng: parseFloat(arbol.longitud) * 1000000
       }));
-      console.log("datos de arboles", arbolesFiltrados);
     } else {
       console.warn("Municipio no definido, no se pueden cargar las coordenadas.");
     }
