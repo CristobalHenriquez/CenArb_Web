@@ -1,77 +1,69 @@
 import api from '../lib/axios';
 
-// Función para obtener el token dinámicamente en base al rol del usuario
 const getAuthToken = (userRole) => {
-  // Obtener el token según el rol
   if (userRole === 'relevador') {
-    return localStorage.getItem('token_relevador'); // Token del Relevador
+    return localStorage.getItem('token_relevador');
   } else if (userRole === 'tecnico') {
-    return localStorage.getItem('token_tecnico'); // Token del Técnico
+    return localStorage.getItem('token_tecnico');
   } else {
-    return localStorage.getItem('token_admin'); // Token del Admin (si es necesario)
+    return localStorage.getItem('token_admin');
   }
 };
 
 export default {
-  // Obtener todos los usuarios
   obtenerClientes(userRole) {
     return api.get(`/getRelevadorTecnico`, {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
   },
 
-  // Agregar un nuevo cliente
   agregarCliente(data, userRole) {
     return api.post('/registerUser', data, {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
   },
 
-  // Obtener un cliente específico según su ID y rol
   obtenerCliente(id, userRole) {
-    return api.get(`/getRelevadorTecnico/${id}`, {
+    return api.get(`/user/${id}`, {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
   },
 
-  // Actualizar un cliente específico
   actualizarCliente(id, data, userRole) {
-    return api.patch(`/clientes/${id}`, data, {
+    console.log(data)
+    return api.put(`/user/${id}`, data, {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
-  },
+  },  
 
-  // Cambiar el estado de un cliente
   cambiarEstado(id, data, userRole) {
-    return api.patch(`/clientes/${id}`, data, {
+    return api.put(`/user/${id}`, data, {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
   },
 
-  // Eliminar un cliente
   eliminarCliente(id, userRole) {
-    return api.delete(`/clientes/${id}`, {
+    return api.delete(`/userEliminar/${id}`, {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
   },
 
-  // Obtener relevamientos
   obtenerRelevamientos(userRole) {
     return api.get('/relevamientos', {
       headers: {
-        Authorization: `Bearer ${getAuthToken(userRole)}`, // Enviar el token adecuado
+        Authorization: `Bearer ${getAuthToken(userRole)}`,
       }
     });
   }

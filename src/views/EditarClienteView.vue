@@ -12,19 +12,25 @@ const toast = useToast();
 
 const { id } = route.params;
 const passwordError = ref('');
+const userRole = localStorage.getItem('userRole'); // Obtenemos el rol guardado
+
 const formData = reactive({
   name: '',
   password: '',
+  password_confirmation: '',
   email: '',
   role: ''
 });
 
 onMounted(() => {
-  ClienteService.obtenerCliente(id)
+  ClienteService.obtenerCliente(id, userRole)
     .then(({ data }) => {
       Object.assign(formData, data);
     })
-    .catch(error => console.log(error));
+    .catch(error => {
+      console.error(error);
+      toast.error('Error al obtener los datos del censista');
+    });
 });
 
 const validarPassword = (event) => {
@@ -43,18 +49,21 @@ const validarNombre = (event) => {
 
 const handleSubmit = (event) => {
   event.preventDefault();
-  
+
   if (formData.password.length < 8) {
     toast.error('La contraseña debe tener al menos 8 caracteres');
     return;
   }
-  
-  ClienteService.actualizarCliente(id, formData)
+
+  ClienteService.actualizarCliente(id, formData, userRole)
     .then(() => {
       toast.success('Censista actualizado con éxito');
       router.push('/inicio');
     })
-    .catch(error => console.log(error));
+    .catch(error => {
+      console.error(error);
+      toast.error('Error al actualizar el censista');
+    });
 };
 </script>
 
@@ -63,9 +72,9 @@ const handleSubmit = (event) => {
     <div class="flex justify-end p-4">
       <RouterLink to="inicio" class="btn-volver">Volver</RouterLink>
     </div>
-    
+
     <Heading class="titulo">Editar Censista</Heading>
-    
+
     <div class="formulario-container">
       <div class="formulario-content">
         <form @submit="handleSubmit" class="formulario">
@@ -73,18 +82,24 @@ const handleSubmit = (event) => {
             <label for="name">Nombre</label>
             <input type="text" id="name" name="name" v-model="formData.name" required @input="validarNombre" />
           </div>
-          
+
           <div class="campo">
             <label for="password">Contraseña</label>
             <input type="password" id="password" name="password" v-model="formData.password" required minlength="8" @input="validarPassword" />
             <p v-if="passwordError" class="error">{{ passwordError }}</p>
           </div>
-          
+
+          <div class="campo">
+            <label for="password_confirmation">Contraseña</label>
+            <input type="password" id="password_confirmation" name="password_confirmation" v-model="formData.password_confirmation" required minlength="8" @input="validarPassword" />
+            <p v-if="passwordError" class="error">{{ passwordError }}</p>
+          </div>
+
           <div class="campo">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" v-model="formData.email" required />
           </div>
-          
+
           <div class="campo">
             <label for="role">Rol</label>
             <select id="role" name="role" v-model="formData.role" required>
@@ -93,7 +108,7 @@ const handleSubmit = (event) => {
               <option value="Técnico">Técnico</option>
             </select>
           </div>
-          
+
           <button type="submit" class="btn-submit">Guardar cambios</button>
         </form>
       </div>
