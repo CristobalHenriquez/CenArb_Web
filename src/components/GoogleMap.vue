@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, onUnmounted } from "vue";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const props = defineProps({
   center: { type: Object, required: true },
@@ -15,6 +15,7 @@ const emit = defineEmits(["showAlert"]);
 
 const mapElement = ref(null);
 const map = ref(null);
+const router = useRouter();
 const route = useRoute();
 let markerClusterer = null;
 
@@ -92,8 +93,8 @@ const getClusterIcon = (count) => {
 
 const getCustomMarkerIcon = () => {
   return {
-    url: "src/components/icons/marker-svgrepo-com.svg", // Asegúrate de que la ruta sea correcta
-    scaledSize: new google.maps.Size(30, 30), // Ajusta el tamaño según sea necesario
+    url: "src/components/icons/marker-svgrepo-com.svg",
+    scaledSize: new google.maps.Size(30, 30), // Ajusta el tamaño
     anchor: new google.maps.Point(20, 40), // Ajusta el ancla para centrar el marcador
   };
 };
@@ -110,12 +111,15 @@ const updateMarkers = () => {
   const marker = new google.maps.Marker({
     position: { lat: location.lat / 1000000, lng: location.lng / 1000000 },
     title: location.name,
-    icon: getCustomMarkerIcon(), // Usando el SVG personalizado
+    id: location.id,
+    icon: getCustomMarkerIcon(),
   });
 
   marker.addListener("click", () => {
     if (route.name === "home") {
       handleMunicipioClick(location);
+    } else if(route.name === "municipio") {
+      verDetalleArbol(location)
     }
   });
 
@@ -148,6 +152,15 @@ const handleMunicipioClick = (location) => {
     co2: co2Formateado || 0,
     totalEspecies: municipio ? municipio.totalEspecies : 0,
   });
+};
+
+//Redirigir a la vista ArbolDetalle al clickear en un marcador
+const verDetalleArbol = (location) => {
+  if (location.id) {
+    router.push({ name: 'arboldetalle', params: { id: location.id } });
+  } else {
+    console.error("El árbol no tiene un ID válido.");
+  }
 };
 
 watch([() => props.center, () => props.zoom, () => props.locations], () => {

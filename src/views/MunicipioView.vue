@@ -66,11 +66,11 @@ const calcularCO2 = (totalArboles) => {
 
 const formatearCO2 = (valor) => {
   if (valor < 1) {
-    return `${(valor * 1000).toFixed(3)} G`;
+    return `${(valor * 1000).toFixed(1)} G`;
   } else if (valor < 1000) {
-    return `${valor.toFixed(3)} KG`;
+    return `${valor.toFixed(1)} KG`;
   } else {
-    return `${(valor / 1000).toFixed(3)} T`;
+    return `${(valor / 1000).toFixed(1)} T`;
   }
 };
 
@@ -105,9 +105,11 @@ const coordenadasArboles = async () => {
       const response = await ArbolService.obtenerArbol();
       const arbolesFiltrados = response?.data?.filter(arbol => arbol.id_municipio === datos.value.id) || [];
       coordenadas.value = arbolesFiltrados.map(arbol => ({
+        id: arbol.id,
         lat: parseFloat(arbol.latitud) * 1000000,
         lng: parseFloat(arbol.longitud) * 1000000
       }));
+      console.log("datos de arboles", arbolesFiltrados);
     } else {
       console.warn("Municipio no definido, no se pueden cargar las coordenadas.");
     }
