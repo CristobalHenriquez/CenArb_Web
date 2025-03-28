@@ -132,7 +132,7 @@ const seleccionarArbol = (arbol) => {
     <!-- 🌳 Detalle completo del árbol seleccionado -->
     <div v-if="arbolSeleccionado"
       class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl flex gap-6">
+      <div class="bg-white p-5 rounded-lg shadow-lg w-full max-w-3xl flex gap-1">
         <div class="w-1/3">
           <img src="../assets/img/euca.jpg" alt="Árbol" class="w-full h-auto rounded-lg shadow">
         </div>
@@ -140,8 +140,8 @@ const seleccionarArbol = (arbol) => {
           <h2 class="text-xl font-bold text-gray-800 mb-4">Detalle del Árbol</h2>
 
           <div class="grid grid-cols-2 gap-6">
-            <div class="space-y-2">
-              <p><strong>Especie:</strong> {{ arbolSeleccionado.especie.nombre_cientifico }}</p>
+            <div class="space-y">
+              <p><strong>Especie:</strong> {{ arbolSeleccionado.especie.nombre_comun }}</p>
               <p><strong>Municipio:</strong> {{ arbolSeleccionado.municipio.nombre }}</p>
               <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{ arbolSeleccionado.longitud
                 }}</p>
@@ -155,7 +155,7 @@ const seleccionarArbol = (arbol) => {
               </p>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y">
               <p><strong>Distancia al cordón:</strong> {{ arbolSeleccionado.tipo_distancia_al_cordon }}</p>
               <p><strong>Interferencia aérea:</strong> {{ arbolSeleccionado.tipo_interferencia_aerea }}</p>
               <p><strong>Tipo de cable:</strong> {{ arbolSeleccionado.tipo_cable }}</p>
@@ -169,15 +169,15 @@ const seleccionarArbol = (arbol) => {
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-5 mt-6">
-            <div class="space-y-2">
+          <div class="grid grid-cols-2 gap-5">
+            <div class="space-y">
               <p><strong>Daño:</strong> {{ arbolSeleccionado.detalle_tipo_daño }}</p>
               <p><strong>Condición del Tronco:</strong> {{ arbolSeleccionado.tipo_condición_tronco }}</p>
               <p><strong>Condición de la Corona:</strong> {{ arbolSeleccionado.tipo_condición_corona }}</p>
               <p><strong>Condición General:</strong> {{ arbolSeleccionado.tipo_condición_general }}</p>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y">
               <p><strong>Fecha de creación:</strong> {{ arbolSeleccionado.created_at }}</p>
               <p><strong>Última actualización:</strong> {{ arbolSeleccionado.updated_at }}</p>
             </div>
