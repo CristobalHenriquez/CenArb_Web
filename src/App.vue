@@ -61,16 +61,16 @@ window.addEventListener("storage", () => {
     </button>
 
       <div class="social-icons space-x-1 md:space-x-2">
-        <a href="https://www.linkedin.com" target="_blank">
+        <a href="https://ar.linkedin.com/company/ramcc-ar" target="_blank">
           <img src="./components/icons/Linke_ico.svg">
         </a>
-        <a href="https://www.instagram.com" target="_blank">
+        <a href="https://www.instagram.com/ramcc_ar/?hl=es" target="_blank">
           <img src="./components/icons/Insta_ico.svg">
         </a>
-        <a href="https://www.youtube.com" target="_blank">
+        <a href="https://www.youtube.com/@RAMCC_ar" target="_blank">
           <img src="./components/icons/You_ico.svg">
         </a>
-        <a href="https://www.facebook.com" target="_blank">
+        <a href="https://www.facebook.com/ramcc.net/?locale=cx_PH" target="_blank">
           <img src="./components/icons/Face_ico.svg">
         </a>
       </div>
@@ -88,16 +88,16 @@ window.addEventListener("storage", () => {
     COMPROMETIDOS CON LA ACCIÓN CLIMÁTICA
   </p>
   <div class="flex space-x-4">
-    <a href="https://www.linkedin.com" target="_blank">
+    <a href="https://ar.linkedin.com/company/ramcc-ar" target="_blank">
       <img src="./components/icons/Linke_ico.svg" class="h-8 w-8">
     </a>
-    <a href="https://www.instagram.com" target="_blank">
+    <a href="https://www.instagram.com/ramcc_ar/?hl=es" target="_blank">
       <img src="./components/icons/Insta_ico.svg" class="h-8 w-8">
     </a>
-    <a href="https://www.youtube.com" target="_blank">
+    <a href="https://www.youtube.com/@RAMCC_ar" target="_blank">
       <img src="./components/icons/You_ico.svg" class="h-8 w-8">
     </a>
-    <a href="https://www.facebook.com" target="_blank">
+    <a href="https://www.facebook.com/ramcc.net/?locale=cx_PH" target="_blank">
       <img src="./components/icons/Face_ico.svg" class="h-8 w-8">
     </a>
   </div>
