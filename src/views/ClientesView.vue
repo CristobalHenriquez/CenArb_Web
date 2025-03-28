@@ -101,32 +101,32 @@ const eliminarCliente = id => {
 
     <Heading>{{ titulo }}</Heading>
 
-    <div v-if="existenClientes" class="flow-root mx-auto mt-10 p-5 bg-white shadow-xl rounded-lg">
-      <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <table class="min-w-full divide-y divide-gray-200 bg-white shadow-lg rounded-lg overflow-hidden">
+    <div v-if="existenClientes" class="flow-root mx-auto mt-10 p-5 bg-white shadow-xl rounded-lg  w-full">
+      <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-3 lg:-mx-8">
+        <div class="min-w-full py-2 align-middle sm:px-3 lg:px-8">
+          <table class="min-w-full w-full divide-y divide-gray-200 bg-white shadow-lg rounded-lg overflow-hidden">
             <thead class="bg-green-800 text-white">
               <tr>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
+                <th scope="col" class="px-3 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Nombre
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
+                <th scope="col" class="px-3 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Rol
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
+                <th scope="col" class="px-3 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Estado
                 </th>
-                <th scope="col" class="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
+                <th scope="col" class="px-3 py-3 text-center text-sm font-semibold uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-gray-50">
+            <tbody class="divide-y divide-gray-100">
               <Cliente 
                 v-for="cliente in clientesPaginados" 
                 :key="cliente.id" 
                 :cliente="cliente"
-                class="hover:bg-green-200 transition-all duration-200 ease-in-out transform hover:scale-101 hover:shadow-md text-gray-700"
+                class="hover:bg-green-200 transition-all duration-150 ease-in-out transform hover:scale-100 hover:shadow-sm text-gray-700 py-2"
                 @actualizar-estado="actualizarEstado"
                 @eliminar-cliente="eliminarCliente"
               />
@@ -134,7 +134,8 @@ const eliminarCliente = id => {
           </table>
         </div>
       </div>
-    </div>
+
+      </div>
 
     <!-- Paginación -->
     <div v-if="existenClientes" class="flex justify-between items-center mt-4 px-5">

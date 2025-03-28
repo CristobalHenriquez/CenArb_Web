@@ -3,30 +3,28 @@ import { onMounted, ref, computed } from 'vue';
 import ArbolService from '@/services/ArbolService';
 import RouterLink from '../components/UI/RouterLink.vue';
 import Heading from '../components/UI/Heading.vue';
-import Arbol from '../components/Arbol.vue';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
 
 const arboles = ref([]);
-const ordenAscendente = ref(true);
-const criterioOrdenacion = ref('especie');
-const filtros = ref({ especie: '', fecha: '', calle: '', barrio: '' });
-
 const paginaActual = ref(1);
 const arbolesPorPagina = ref(10);
+const filtros = ref({ especie: '', fecha: '', calle: '', barrio: '' });
+const arbolSeleccionado = ref(null);
 
 onMounted(() => {
   obtenerArboles();
 });
 
-const obtenerArboles = () => {
-  ArbolService.obtenerArboles()
-    .then(({ data }) => {
-      arboles.value = data.data;
-    })
-    .catch(error => console.error('Error obteniendo árboles', error));
+const obtenerArboles = async () => {
+  try {
+    const { data } = await ArbolService.obtenerArboles();
+    console.log('📌 Datos recibidos:', data);
+    arboles.value = data.data || [];
+  } catch (error) {
+    console.error('❌ Error obteniendo árboles', error);
+  }
 };
 
+// 🔹 Filtrar árboles según criterios
 const arbolesFiltrados = computed(() => {
   return arboles.value.filter(arbol => {
     const coincideEspecie = arbol.especie?.nombre_comun.toLowerCase().includes(filtros.value.especie.toLowerCase());
@@ -38,34 +36,12 @@ const arbolesFiltrados = computed(() => {
   });
 });
 
-const toggleOrdenacion = (criterio) => {
-  if (criterio === criterioOrdenacion.value) {
-    ordenAscendente.value = !ordenAscendente.value;
-  } else {
-    criterioOrdenacion.value = criterio;
-    ordenAscendente.value = true;
-  }
-};
-
-const arbolesOrdenados = computed(() => {
-  return [...arbolesFiltrados.value].sort((a, b) => {
-    let valorA, valorB;
-    if (criterioOrdenacion.value === 'fecha') {
-      valorA = a.created_at ? new Date(a.created_at) : new Date(0);
-      valorB = b.created_at ? new Date(b.created_at) : new Date(0);
-    } else {
-      valorA = a[criterioOrdenacion.value]?.toLowerCase() || '';
-      valorB = b[criterioOrdenacion.value]?.toLowerCase() || '';
-    }
-    return ordenAscendente.value ? (valorA < valorB ? -1 : 1) : (valorA > valorB ? -1 : 1);
-  });
-});
-
-const totalPaginas = computed(() => Math.ceil(arbolesOrdenados.value.length / arbolesPorPagina.value));
+// 🔹 Paginación
+const totalPaginas = computed(() => Math.ceil(arbolesFiltrados.value.length / arbolesPorPagina.value));
 
 const arbolesPaginados = computed(() => {
   const inicio = (paginaActual.value - 1) * arbolesPorPagina.value;
-  return arbolesOrdenados.value.slice(inicio, inicio + arbolesPorPagina.value);
+  return arbolesFiltrados.value.slice(inicio, inicio + arbolesPorPagina.value);
 });
 
 const paginaAnterior = () => {
@@ -74,6 +50,11 @@ const paginaAnterior = () => {
 
 const paginaSiguiente = () => {
   if (paginaActual.value < totalPaginas.value) paginaActual.value++;
+};
+
+// 🌳 Seleccionar un árbol para ver su detalle
+const seleccionarArbol = (arbol) => {
+  arbolSeleccionado.value = arbol;
 };
 </script>
 
@@ -84,6 +65,7 @@ const paginaSiguiente = () => {
       <RouterLink to="municipio">Volver</RouterLink>
     </div>
 
+    <!-- Filtros -->
     <div class="p-4 bg-gray-100 rounded-lg shadow-md">
       <h2 class="text-lg font-semibold text-gray-700 mb-3">Filtros de búsqueda</h2>
       <div class="flex flex-wrap gap-4">
@@ -94,32 +76,69 @@ const paginaSiguiente = () => {
       </div>
     </div>
 
-    <div v-if="arbolesPaginados.length" class="flex flex-col flex-grow items-center">
+    <!-- Tabla de árboles -->
+    <div v-if="arbolesPaginados.length" class="flex flex-col flex-grow items-center mt-4">
       <div class="w-full max-w-6xl p-5 bg-white shadow-lg rounded-lg">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg overflow-hidden">
             <thead class="bg-green-800 text-white">
               <tr>
-                <th class="px-6 py-3 text-center"><button @click="toggleOrdenacion('especie')">Especie</button></th>
-                <th class="px-6 py-3 text-center"><button @click="toggleOrdenacion('fecha')">Fecha del Censo</button></th>
-                <th class="px-6 py-3 text-center">Estado general</th>
-                <th class="px-6 py-3 text-center"><button @click="toggleOrdenacion('calle')">Calle</button></th>
-                <th class="px-6 py-3 text-center"><button @click="toggleOrdenacion('barrio')">Barrio</button></th>
-                <th class="px-6 py-3 text-center">Requiere intervención</th>
+                <th class="px-6 py-3 text-center">Especie</th>
+                <th class="px-6 py-3 text-center">Fecha del Censo</th>
+                <th class="px-6 py-3 text-center">Calle</th>
+                <th class="px-6 py-3 text-center">Barrio</th>
+                <th class="px-6 py-3 text-center">Acción</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-gray-50">
-              <Arbol v-for="arbol in arbolesPaginados" :key="arbol.id" :arbol="arbol" />
+              <tr v-for="arbol in arbolesPaginados" :key="arbol.id">
+                <td class="px-6 py-3 text-center">{{ arbol.especie?.nombre_comun || 'Sin especie' }}</td>
+                <td class="px-6 py-3 text-center">{{ arbol.created_at }}</td>
+                <td class="px-6 py-3 text-center">{{ arbol.calle }}</td>
+                <td class="px-6 py-3 text-center">{{ arbol.barrio }}</td>
+                <td class="px-6 py-3 text-center">
+                  <button @click="seleccionarArbol(arbol)" class="px-3 py-1 bg-blue-500 text-white rounded">
+                    Ver Detalle
+                  </button>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
+        
+        <!-- Paginación -->
         <div class="flex justify-between items-center mt-4">
-          <button @click="paginaAnterior" :disabled="paginaActual === 1" class="px-3 py-1 bg-gray-300 rounded">Anterior</button>
+          <button @click="paginaAnterior" :disabled="paginaActual === 1" class="px-3 py-1 bg-gray-300 rounded">
+            Anterior
+          </button>
           <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
-          <button @click="paginaSiguiente" :disabled="paginaActual === totalPaginas" class="px-3 py-1 bg-gray-300 rounded">Siguiente</button>
+          <button @click="paginaSiguiente" :disabled="paginaActual === totalPaginas" class="px-3 py-1 bg-gray-300 rounded">
+            Siguiente
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Mensaje si no hay resultados -->
     <p v-else class="text-center text-gray-500 mt-10">No hay árboles</p>
+
+    <!-- 🌳 Detalle completo del árbol seleccionado -->
+    <div v-if="arbolSeleccionado" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 class="text-xl font-bold text-gray-800">Detalle del Árbol</h2>
+        <p><strong>Especie:</strong> {{ arbolSeleccionado.especie?.nombre_comun || 'Sin especie' }}</p>
+        <p><strong>Nombre Científico:</strong> {{ arbolSeleccionado.especie?.nombre_cientifico || 'Desconocido' }}</p>
+        <p><strong>Fecha del Censo:</strong> {{ arbolSeleccionado.created_at }}</p>
+        <p><strong>Calle:</strong> {{ arbolSeleccionado.calle }}</p>
+        <p><strong>Barrio:</strong> {{ arbolSeleccionado.barrio }}</p>
+        <p><strong>Altura:</strong> {{ arbolSeleccionado.altura || 'No disponible' }} m</p>
+        <p><strong>Diámetro:</strong> {{ arbolSeleccionado.diametro || 'No disponible' }} cm</p>
+        <p><strong>Estado:</strong> {{ arbolSeleccionado.estado_general || 'No especificado' }}</p>
+        <p><strong>Intervención necesaria:</strong> {{ arbolSeleccionado.requiere_intervencion ? 'Sí' : 'No' }}</p>
+        <button @click="arbolSeleccionado = null" class="mt-4 px-4 py-2 bg-red-500 text-white rounded">
+          Cerrar
+        </button>
+      </div>
+    </div>
   </div>
 </template>
