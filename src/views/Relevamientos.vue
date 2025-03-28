@@ -24,6 +24,11 @@ const obtenerArboles = async () => {
   }
 };
 
+// Función para formatear la fecha
+const formatearFecha = (fecha) => {
+  return fecha ? new Date(fecha).toLocaleDateString() : '';
+};
+
 // 🔹 Filtrar árboles según criterios
 const arbolesFiltrados = computed(() => {
   return arboles.value.filter(arbol => {
@@ -61,6 +66,7 @@ const seleccionarArbol = (arbol) => {
 <template>
   <div class="flex flex-col min-h-screen">
     <Heading class="text-left">Relevamientos</Heading>
+
     <div class="flex justify-end p-4 bg-white">
       <RouterLink to="municipio">Volver</RouterLink>
     </div>
@@ -93,7 +99,7 @@ const seleccionarArbol = (arbol) => {
             <tbody class="divide-y divide-gray-200 bg-gray-50">
               <tr v-for="arbol in arbolesPaginados" :key="arbol.id">
                 <td class="px-6 py-3 text-center">{{ arbol.especie?.nombre_comun || 'Sin especie' }}</td>
-                <td class="px-6 py-3 text-center">{{ arbol.created_at }}</td>
+                <td class="px-6 py-3 text-center">{{ formatearFecha(arbol.created_at) }}</td>
                 <td class="px-6 py-3 text-center">{{ arbol.calle }}</td>
                 <td class="px-6 py-3 text-center">{{ arbol.barrio }}</td>
                 <td class="px-6 py-3 text-center">
@@ -105,14 +111,15 @@ const seleccionarArbol = (arbol) => {
             </tbody>
           </table>
         </div>
-        
+
         <!-- Paginación -->
         <div class="flex justify-between items-center mt-4">
           <button @click="paginaAnterior" :disabled="paginaActual === 1" class="px-3 py-1 bg-gray-300 rounded">
             Anterior
           </button>
           <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
-          <button @click="paginaSiguiente" :disabled="paginaActual === totalPaginas" class="px-3 py-1 bg-gray-300 rounded">
+          <button @click="paginaSiguiente" :disabled="paginaActual === totalPaginas"
+            class="px-3 py-1 bg-gray-300 rounded">
             Siguiente
           </button>
         </div>
@@ -123,21 +130,63 @@ const seleccionarArbol = (arbol) => {
     <p v-else class="text-center text-gray-500 mt-10">No hay árboles</p>
 
     <!-- 🌳 Detalle completo del árbol seleccionado -->
-    <div v-if="arbolSeleccionado" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-xl font-bold text-gray-800">Detalle del Árbol</h2>
-        <p><strong>Especie:</strong> {{ arbolSeleccionado.especie?.nombre_comun || 'Sin especie' }}</p>
-        <p><strong>Nombre Científico:</strong> {{ arbolSeleccionado.especie?.nombre_cientifico || 'Desconocido' }}</p>
-        <p><strong>Fecha del Censo:</strong> {{ arbolSeleccionado.created_at }}</p>
-        <p><strong>Calle:</strong> {{ arbolSeleccionado.calle }}</p>
-        <p><strong>Barrio:</strong> {{ arbolSeleccionado.barrio }}</p>
-        <p><strong>Altura:</strong> {{ arbolSeleccionado.altura || 'No disponible' }} m</p>
-        <p><strong>Diámetro:</strong> {{ arbolSeleccionado.diametro || 'No disponible' }} cm</p>
-        <p><strong>Estado:</strong> {{ arbolSeleccionado.estado_general || 'No especificado' }}</p>
-        <p><strong>Intervención necesaria:</strong> {{ arbolSeleccionado.requiere_intervencion ? 'Sí' : 'No' }}</p>
-        <button @click="arbolSeleccionado = null" class="mt-4 px-4 py-2 bg-red-500 text-white rounded">
-          Cerrar
-        </button>
+    <div v-if="arbolSeleccionado"
+      class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl flex gap-6">
+        <div class="w-1/3">
+          <img src="../assets/img/euca.jpg" alt="Árbol" class="w-full h-auto rounded-lg shadow">
+        </div>
+        <div class="w-2/3">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Detalle del Árbol</h2>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <p><strong>Especie:</strong> {{ arbolSeleccionado.especie.nombre_cientifico }}</p>
+              <p><strong>Municipio:</strong> {{ arbolSeleccionado.municipio.nombre }}</p>
+              <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{ arbolSeleccionado.longitud
+                }}</p>
+              <p><strong>Dirección:</strong> {{ arbolSeleccionado.calle }} {{ arbolSeleccionado.numero_aprox }}</p>
+              <p><strong>Identificación:</strong> {{ arbolSeleccionado.identificacion }}</p>
+              <p><strong>Barrio:</strong> {{ arbolSeleccionado.barrio }}</p>
+              <p><strong>Altura:</strong> {{ arbolSeleccionado.tipo_altura }}</p>
+              <p><strong>Diámetro del tronco:</strong> {{ arbolSeleccionado.tipo_diametro_tronco }}</p>
+              <p><strong>Ámbito:</strong> {{ arbolSeleccionado.tipo_ambito }}</p>
+              <p><strong>Distancia entre ejemplares:</strong> {{ arbolSeleccionado.tipo_distancia_entre_ejemplares }}
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <p><strong>Distancia al cordón:</strong> {{ arbolSeleccionado.tipo_distancia_al_cordon }}</p>
+              <p><strong>Interferencia aérea:</strong> {{ arbolSeleccionado.tipo_interferencia_aerea }}</p>
+              <p><strong>Tipo de cable:</strong> {{ arbolSeleccionado.tipo_cable }}</p>
+              <p><strong>Cazuela:</strong> {{ arbolSeleccionado.cazuela }}</p>
+              <p><strong>Protegido:</strong> {{ arbolSeleccionado.protegido ? 'Sí' : 'No' }}</p>
+              <p><strong>Fecha del Censo:</strong> {{ formatearFecha(arbolSeleccionado.created_at) }}</p>
+              <p><strong>Interferencias:</strong> {{ arbolSeleccionado.interferencias }}</p>
+              <p><strong>Detalles adicionales:</strong> {{ arbolSeleccionado.detalles_arbol }}</p>
+              <p><strong>Edad:</strong> {{ arbolSeleccionado.edad }}</p>
+              <p><strong>Condición Base:</strong> {{ arbolSeleccionado.tipo_condición_base }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-5 mt-6">
+            <div class="space-y-2">
+              <p><strong>Daño:</strong> {{ arbolSeleccionado.detalle_tipo_daño }}</p>
+              <p><strong>Condición del Tronco:</strong> {{ arbolSeleccionado.tipo_condición_tronco }}</p>
+              <p><strong>Condición de la Corona:</strong> {{ arbolSeleccionado.tipo_condición_corona }}</p>
+              <p><strong>Condición General:</strong> {{ arbolSeleccionado.tipo_condición_general }}</p>
+            </div>
+
+            <div class="space-y-2">
+              <p><strong>Fecha de creación:</strong> {{ arbolSeleccionado.created_at }}</p>
+              <p><strong>Última actualización:</strong> {{ arbolSeleccionado.updated_at }}</p>
+            </div>
+          </div>
+
+          <button @click="arbolSeleccionado = null" class="mt-4 px-4 py-2 bg-red-500 text-white rounded w-full">
+            Cerrar
+          </button>
+        </div>
       </div>
     </div>
   </div>
