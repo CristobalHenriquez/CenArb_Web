@@ -19,6 +19,9 @@ export default {
   eliminarArbol(id) {
     return api.delete(`/arbol/${id}`);
   },
+  obtenerFotoArbol(id) {
+    return api.get(`/foto_arboles/${id}`);
+  },
   mostrarArboles(){
     return api.get('/totalArboles')
   },

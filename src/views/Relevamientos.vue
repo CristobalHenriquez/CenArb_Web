@@ -9,6 +9,7 @@ const paginaActual = ref(1);
 const arbolesPorPagina = ref(10);
 const filtros = ref({ especie: '', fecha: '', calle: '', barrio: '' });
 const arbolSeleccionado = ref(null);
+const fotoArbol = ref('');
 
 onMounted(() => {
   obtenerArboles();
@@ -57,10 +58,51 @@ const paginaSiguiente = () => {
   if (paginaActual.value < totalPaginas.value) paginaActual.value++;
 };
 
+const cargarFotoArbol = async (id) => {
+  if (!id) {
+    fotoArbol.value = '../assets/img/default.jpg'; // Imagen por defecto
+    return;
+  }
+
+  try {
+    const response = await ArbolService.obtenerFotoArbol(id);
+
+    if (response.data && response.data.ruta_foto) {
+      console.log("🔗 URL de la foto:", response.data.ruta_foto);
+      fotoArbol.value = response.data.ruta_foto; // Asignar la URL directamente
+    } else {
+      console.warn("⚠️ No se encontró la URL de la foto.");
+      fotoArbol.value = '../assets/img/default.jpg';
+    }
+  } catch (error) {
+    console.error('❌ Error al obtener la foto del árbol:', error);
+    fotoArbol.value = '../assets/img/default.jpg';
+  }
+};
+
+
+
+
+
+
 // 🌳 Seleccionar un árbol para ver su detalle
 const seleccionarArbol = (arbol) => {
   arbolSeleccionado.value = arbol;
+  cargarFotoArbol(arbol.id);
 };
+
+const eliminarArbol = async (id) => {
+  if (!confirm('¿Estás seguro de que deseas eliminar este árbol?')) return;
+
+  try {
+    await ArbolService.eliminarArbol(id);
+    arboles.value = arboles.value.filter(arbol => arbol.id !== id);
+    console.log(`✅ Árbol con ID ${id} eliminado`);
+  } catch (error) {
+    console.error(`❌ Error al eliminar el árbol con ID ${id}`, error);
+  }
+};
+
 </script>
 
 <template>
@@ -102,9 +144,13 @@ const seleccionarArbol = (arbol) => {
                 <td class="px-6 py-3 text-center">{{ formatearFecha(arbol.created_at) }}</td>
                 <td class="px-6 py-3 text-center">{{ arbol.calle }}</td>
                 <td class="px-6 py-3 text-center">{{ arbol.barrio }}</td>
-                <td class="px-6 py-3 text-center">
+                <td class="px-6 py-3 text-center flex justify-center gap-2">
                   <button @click="seleccionarArbol(arbol)" class="px-3 py-1 bg-blue-500 text-white rounded">
                     Ver Detalle
+                  </button>
+                <tr></tr>
+                  <button @click="eliminarArbol(arbol.id)" class="px-3 py-1 bg-red-500 text-white rounded">
+                    Eliminar
                   </button>
                 </td>
               </tr>
@@ -134,7 +180,7 @@ const seleccionarArbol = (arbol) => {
       class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
       <div class="bg-white p-5 rounded-lg shadow-lg w-full max-w-3xl flex gap-1">
         <div class="w-1/3">
-          <img src="../assets/img/euca.jpg" alt="Árbol" class="w-full h-auto rounded-lg shadow">
+          <img :src="fotoArbol" alt="Árbol" class="w-full h-auto rounded-lg shadow">
         </div>
         <div class="w-2/3">
           <h2 class="text-xl font-bold text-gray-800 mb-4">Detalle del Árbol</h2>
@@ -143,8 +189,7 @@ const seleccionarArbol = (arbol) => {
             <div class="space-y">
               <p><strong>Especie:</strong> {{ arbolSeleccionado.especie.nombre_comun }}</p>
               <p><strong>Municipio:</strong> {{ arbolSeleccionado.municipio.nombre }}</p>
-              <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{ arbolSeleccionado.longitud
-                }}</p>
+              <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{ arbolSeleccionado.longitud}}</p>
               <p><strong>Dirección:</strong> {{ arbolSeleccionado.calle }} {{ arbolSeleccionado.numero_aprox }}</p>
               <p><strong>Identificación:</strong> {{ arbolSeleccionado.identificacion }}</p>
               <p><strong>Barrio:</strong> {{ arbolSeleccionado.barrio }}</p>
