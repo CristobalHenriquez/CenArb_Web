@@ -148,7 +148,6 @@ const eliminarArbol = async (id) => {
                   <button @click="seleccionarArbol(arbol)" class="px-3 py-1 bg-blue-500 text-white rounded">
                     Ver Detalle
                   </button>
-                <tr></tr>
                   <button @click="eliminarArbol(arbol.id)" class="px-3 py-1 bg-red-500 text-white rounded">
                     Eliminar
                   </button>
@@ -223,8 +222,8 @@ const eliminarArbol = async (id) => {
             </div>
 
             <div class="space-y">
-              <p><strong>Fecha de creación:</strong> {{ arbolSeleccionado.created_at }}</p>
-              <p><strong>Última actualización:</strong> {{ arbolSeleccionado.updated_at }}</p>
+              <p><strong>Fecha de creación:</strong> {{ formatearFecha(arbolSeleccionado.created_at) }}</p>
+              <p><strong>Última actualización:</strong> {{ formatearFecha(arbolSeleccionado.updated_at) }}</p>
             </div>
           </div>
 
