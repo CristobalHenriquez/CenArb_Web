@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, onUnmounted } from "vue";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const props = defineProps({
   center: { type: Object, required: true },
@@ -11,11 +11,10 @@ const props = defineProps({
   isMainView: { type: Boolean, default: true },
 });
 
-const emit = defineEmits(["showAlert"]);
+const emit = defineEmits(["showAlert", "seleccionarArbol"]);
 
 const mapElement = ref(null);
 const map = ref(null);
-const router = useRouter();
 const route = useRoute();
 let markerClusterer = null;
 
@@ -37,10 +36,18 @@ const loadGoogleMaps = async () => {
   if (document.querySelector("script[src*='maps.googleapis.com']")) return;
 
   const script = document.createElement("script");
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&callback=initMap&libraries=visualization,places`;
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=visualization,places`;
   script.async = true;
+  script.defer = true;
   document.head.appendChild(script);
-  window.initMap = initMap;
+
+  script.onload = () => {
+    initMap();
+  };
+
+  script.onerror = () => {
+    console.error("Error al cargar Google Maps.");
+  };
 };
 
 // Inicia mapa
@@ -119,7 +126,7 @@ const updateMarkers = () => {
     if (route.name === "home") {
       handleMunicipioClick(location);
     } else if(route.name === "municipio") {
-      verDetalleArbol(location)
+      handleArbolClick(location);
     }
   });
 
@@ -154,19 +161,15 @@ const handleMunicipioClick = (location) => {
   });
 };
 
-//Redirigir a la vista ArbolDetalle al clickear en un marcador
-const verDetalleArbol = (location) => {
-  if (location.id) {
-    router.push({ name: 'arboldetalle', params: { id: location.id } });
-  } else {
-    console.error("El árbol no tiene un ID válido.");
-  }
+//Enviar datos del arbol al clickear en un marcador
+const handleArbolClick = (location) => {
+  emit("seleccionarArbol", location.id);
 };
 
-watch([() => props.center, () => props.zoom, () => props.locations], () => {
+watch([() => props.center, () => props.zoom, () => props.locations], ([newCenter, newZoom]) => {
   if (map.value) {
-    map.value.setCenter(props.center);
-    map.value.setZoom(props.zoom);
+    map.value.setCenter(newCenter);
+    map.value.setZoom(newZoom);
     updateMarkers();
   }
 });

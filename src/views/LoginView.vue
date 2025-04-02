@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref, watchEffect, onMounted} from 'vue';
 import AuthenticationService from '@/services/AuthenticationService';
 import { useRouter } from 'vue-router';
 
@@ -12,7 +12,7 @@ const handleIconClick = (node, e) => {
 }
 
 const router = useRouter();
-const isLoggedIn = ref(!!localStorage.getItem("token"));
+const isLoggedIn = ref(!!localStorage.getItem('token'));
 const form = ref({
   email: '',
   password: ''
@@ -98,7 +98,11 @@ const recoverPassword = () => {
 
 // Verificar sesión en cada recarga
 watchEffect(() => {
-  isLoggedIn.value = !!localStorage.getItem("token");
+  isLoggedIn.value = !!localStorage.getItem('token');
+});
+
+onMounted(() => {
+  isLoggedIn.value = !!localStorage.getItem('token');
 });
 </script>
 

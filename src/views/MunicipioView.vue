@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import ClienteService from '@/services/ClienteService';
 import AuthenticationService from '@/services/AuthenticationService';
 import ArbolService from '@/services/ArbolService';
@@ -14,6 +14,8 @@ const arbol = ref({});
 const coordenadas = ref([]);
 const mapZoom = 12;
 const clientes = ref([]);
+const arbolSeleccionadoId = ref(null);
+const fotoArbol = ref('../assets/img/default.jpg');
 
 defineProps({
   titulo: { type: String }
@@ -107,7 +109,8 @@ const coordenadasArboles = async () => {
       coordenadas.value = arbolesFiltrados.map(arbol => ({
         id: arbol.id,
         lat: parseFloat(arbol.latitud) * 1000000,
-        lng: parseFloat(arbol.longitud) * 1000000
+        lng: parseFloat(arbol.longitud) * 1000000,
+        ...arbol
       }));
     } else {
       console.warn("Municipio no definido, no se pueden cargar las coordenadas.");
@@ -119,8 +122,38 @@ const coordenadasArboles = async () => {
     cargando.value = false;
   }
 };
-</script>
 
+// Buscar datos del id del marcador
+const seleccionarArbol = (id) => {
+  arbolSeleccionadoId.value = id;
+  cargarFotoArbol(id);
+};
+
+const arbolSeleccionado = computed(() => {
+  return coordenadas.value.find(arbol => arbol.id === arbolSeleccionadoId.value) || null;
+});
+
+// Cargar foto del arbol seleccionado
+const cargarFotoArbol = async (id) => {
+  if (!id) {
+    fotoArbol.value = '../assets/img/default.jpg';
+    return;
+  }
+
+  try {
+    const response = await ArbolService.obtenerFotoArbol(id);
+    fotoArbol.value = response.data?.ruta_foto || '../assets/img/default.jpg';
+  } catch (error) {
+    console.error('Error al obtener la foto del árbol:', error);
+    fotoArbol.value = '../assets/img/default.jpg';
+  }
+};
+
+const formatearFecha = (fecha) => {
+  return fecha ? new Date(fecha).toLocaleDateString() : '';
+};
+
+</script>
 
 <template>
   
@@ -128,7 +161,7 @@ const coordenadasArboles = async () => {
     <div class="w-full h-auto bg-white py-20">
       <h1 class="flex justify-center font-semibold text-center text-5xl pb-16 text-[#042825]">Bienvenido municipio de 
       <span v-if="cargando" class="p-3"><Spinner :size="'36'" :color="'gray-300'" :animate="true" /></span>
-      <span v-else class="pl-4">{{datos.nombre}}</span>
+      <span v-else class="pl-4">{{datos?.nombre}}</span>
       </h1>
       <div class="flex flex-col space-y-10 md:space-y-0 md:flex-row md:justify-center md:space-x-24 xl:space-x-40">
         <div class="flex flex-col items-center">
@@ -162,7 +195,7 @@ const coordenadasArboles = async () => {
         <div class="w-80  h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
             <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
-            <p v-else class="font-bold text-2xl xl:text-3xl text-black">{{arbol.totalArboles}}</p>
+            <p v-else class="font-bold text-2xl xl:text-3xl text-black">{{arbol?.totalArboles}}</p>
             <p class="text-black text-lg xl:text-2xl">Árboles relevados</p>
           </div>
           <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/Arbol_Home.svg" alt="Árbol">
@@ -171,7 +204,7 @@ const coordenadasArboles = async () => {
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
             <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
-            <p v-else class="font-bold text-2xl xl:text-3xl text-black">{{ arbol.co2Absorbido }}</p>
+            <p v-else class="font-bold text-2xl xl:text-3xl text-black">{{ arbol?.co2Absorbido }}</p>
             <p class="text-black text-lg xl:text-2xl">Absorción de CO2 Aprox</p>
           </div>
           <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/CO2_Home.svg" alt="CO2">
@@ -180,7 +213,7 @@ const coordenadasArboles = async () => {
         <div class="w-80 h-28 sm:h-32 xl:h-36 bg-[#e2e4e5] rounded-2xl p-10 md:p-5 xl:p-10 flex items-center shadow-inner-top">
           <div class="flex flex-col w-3/5">
             <Spinner v-if="cargando" :size="'48'" :color="'gray-300'" :animate="true" />
-            <p v-else class="font-bold text-2xl xl:text-3xl text-black">{{arbol.totalEspecies}}</p>
+            <p v-else class="font-bold text-2xl xl:text-3xl text-black">{{arbol?.totalEspecies}}</p>
             <p class="text-black text-lg xl:text-2xl">Especies de árboles</p>
           </div>
           <img class="w-12 sm:w-14 md:w-12 xl:w-16 ml-auto" src="../components/icons/Especies_Home.svg" alt="Especies de árboles">
@@ -194,8 +227,68 @@ const coordenadasArboles = async () => {
       <h1 class="font-semibold text-center text-5xl pb-16 text-[#042825]">Mapa interactivo</h1>
       <div class="flex justify-center">
         <div class="w-3/4 h-[550px] border-[#042825] border-8 rounded-3xl">
-        <GoogleMap :center="mapCenter" :zoom="mapZoom" :locations="coordenadas" class="rounded-2xl" /> 
+        <GoogleMap :center="mapCenter" :zoom="mapZoom" :locations="coordenadas" @seleccionar-arbol="seleccionarArbol" class="rounded-2xl" /> 
         </div>
     </div>
     </div>
+
+    <div v-if="arbolSeleccionado && arbolSeleccionado.especie"
+      class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+      <div class="bg-white p-5 rounded-lg shadow-lg w-full max-w-3xl flex gap-1">
+        <div class="w-1/3">
+          <img :src="fotoArbol" alt="Árbol" class="w-full h-auto rounded-lg shadow">
+        </div>
+        <div class="w-2/3">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Detalle del Árbol</h2>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y">
+              <p><strong>Especie:</strong> {{ arbolSeleccionado.especie.nombre_comun }}</p>
+              <p><strong>Municipio:</strong> {{ arbolSeleccionado.municipio.nombre }}</p>
+              <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{ arbolSeleccionado.longitud}}</p>
+              <p><strong>Dirección:</strong> {{ arbolSeleccionado.calle }} {{ arbolSeleccionado.numero_aprox }}</p>
+              <p><strong>Identificación:</strong> {{ arbolSeleccionado.identificacion }}</p>
+              <p><strong>Barrio:</strong> {{ arbolSeleccionado.barrio }}</p>
+              <p><strong>Altura:</strong> {{ arbolSeleccionado.tipo_altura }}</p>
+              <p><strong>Diámetro del tronco:</strong> {{ arbolSeleccionado.tipo_diametro_tronco }}</p>
+              <p><strong>Ámbito:</strong> {{ arbolSeleccionado.tipo_ambito }}</p>
+              <p><strong>Distancia entre ejemplares:</strong> {{ arbolSeleccionado.tipo_distancia_entre_ejemplares }}
+              </p>
+            </div>
+
+            <div class="space-y">
+              <p><strong>Distancia al cordón:</strong> {{ arbolSeleccionado.tipo_distancia_al_cordon }}</p>
+              <p><strong>Interferencia aérea:</strong> {{ arbolSeleccionado.tipo_interferencia_aerea }}</p>
+              <p><strong>Tipo de cable:</strong> {{ arbolSeleccionado.tipo_cable }}</p>
+              <p><strong>Cazuela:</strong> {{ arbolSeleccionado.cazuela }}</p>
+              <p><strong>Protegido:</strong> {{ arbolSeleccionado.protegido ? 'Sí' : 'No' }}</p>
+              <p><strong>Fecha del Censo:</strong> {{ formatearFecha(arbolSeleccionado.created_at) }}</p>
+              <p><strong>Interferencias:</strong> {{ arbolSeleccionado.interferencias }}</p>
+              <p><strong>Detalles adicionales:</strong> {{ arbolSeleccionado.detalles_arbol }}</p>
+              <p><strong>Edad:</strong> {{ arbolSeleccionado.edad }}</p>
+              <p><strong>Condición Base:</strong> {{ arbolSeleccionado.tipo_condición_base }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-5">
+            <div class="space-y">
+              <p><strong>Daño:</strong> {{ arbolSeleccionado.detalle_tipo_daño }}</p>
+              <p><strong>Condición del Tronco:</strong> {{ arbolSeleccionado.tipo_condición_tronco }}</p>
+              <p><strong>Condición de la Corona:</strong> {{ arbolSeleccionado.tipo_condición_corona }}</p>
+              <p><strong>Condición General:</strong> {{ arbolSeleccionado.tipo_condición_general }}</p>
+            </div>
+
+            <div class="space-y">
+              <p><strong>Fecha de creación:</strong> {{ formatearFecha(arbolSeleccionado.created_at) }}</p>
+              <p><strong>Última actualización:</strong> {{ formatearFecha(arbolSeleccionado.updated_at) }}</p>
+            </div>
+          </div>
+
+          <button @click="arbolSeleccionadoId = null" class="mt-4 px-4 py-2 bg-red-500 text-white rounded w-full">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
 </template>

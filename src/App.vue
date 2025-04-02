@@ -6,12 +6,12 @@ import { ref, watchEffect } from "vue";
 const route = useRoute();
 const router = useRouter();
 
-const isLoggedIn = ref(!!localStorage.getItem("token"));
+const isLoggedIn = ref(!!localStorage.getItem('token'));
 
 const logout = async () => {
   try {
     await AuthenticationService.salir();
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     isLoggedIn.value = false;
     router.push("/");
   } catch (error) {
@@ -21,11 +21,11 @@ const logout = async () => {
 
 
 watchEffect(() => {
-  isLoggedIn.value = !!localStorage.getItem("token");
+  isLoggedIn.value = !!localStorage.getItem('token');
 });
 
 window.addEventListener("storage", () => {
-  isLoggedIn.value = !!localStorage.getItem("token");
+  isLoggedIn.value = !!localStorage.getItem('token');
 });
 </script>
 
