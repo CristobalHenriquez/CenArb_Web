@@ -4,6 +4,9 @@ import ArbolService from '@/services/ArbolService';
 import RouterLink from '../components/UI/RouterLink.vue';
 import Heading from '../components/UI/Heading.vue';
 
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 const arboles = ref([]);
 const paginaActual = ref(1);
 const arbolesPorPagina = ref(10);
@@ -103,6 +106,51 @@ const eliminarArbol = async (id) => {
   }
 };
 
+
+// 🆕 Función para exportar todos los detalles del árbol a Excel
+const exportarExcel = () => {
+  const datos = arbolesFiltrados.value.map(arbol => ({
+    ID: arbol.id,
+    'Especie Nombre Científico': arbol.especie?.nombre_cientifico || 'N/A',
+    Municipio: arbol.id_municipio || 'N/A',
+    Coordenadas: `Lat: ${arbol.latitud}, Long: ${arbol.longitud}`,
+    Dirección: `${arbol.calle || ''} ${arbol.numero_aprox || ''}`,
+    Identificación: arbol.identificacion || 'N/A',
+    Barrio: arbol.barrio || 'N/A',
+    'Altura': arbol.tipo_altura || 'N/A',
+    'Diámetro del Tronco': arbol.tipo_diametro_tronco || 'N/A',
+    'Ámbito': arbol.tipo_ambito || 'N/A',
+    'Distancia entre Ejemplares': arbol.tipo_distancia_entre_ejemplares || 'N/A',
+    'Distancia al Cordón': arbol.tipo_distancia_al_cordon || 'N/A',
+    'Interferencia Aérea': arbol.tipo_interferencia_aerea || 'N/A',
+    'Tipo de Cable': arbol.tipo_cable || 'N/A',
+    'Requiere Intervención': arbol.requiere_intervencion ? 'Sí' : 'No',
+    'Tipo de Intervención': arbol.tipo_intervencion || 'N/A',
+    'Tratamiento Previo': arbol.tratamiento_previo || 'N/A',
+    'Cazuela': arbol.cazuela || 'N/A',
+    'Protegido': arbol.protegido ? 'Sí' : 'No',
+    'Fecha del Censo': arbol.fecha_censo || 'N/A',
+    'Interferencias': arbol.interferencias || 'N/A',
+    'Detalles Adicionales': arbol.detalles_arbol || 'N/A',
+    'Edad': arbol.edad || 'N/A',
+    'Fecha de Creación': new Date(arbol.created_at).toLocaleDateString() || 'N/A',
+    'Última Actualización': new Date(arbol.updated_at).toLocaleDateString() || 'N/A',
+    'Condición Base': arbol.tipo_condición_base || 'N/A',
+    'Daño': arbol.detalle_tipo_daño || 'N/A',
+    'Condición del Tronco': arbol.tipo_condición_tronco || 'N/A',
+    'Condición de la Corona': arbol.tipo_condición_corona || 'N/A',
+    'Condición General': arbol.tipo_condición_general || 'N/A'
+  }));
+
+  const hojaDeTrabajo = XLSX.utils.json_to_sheet(datos);
+  const libroDeTrabajo = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeTrabajo, 'Árboles');
+  const excelBuffer = XLSX.write(libroDeTrabajo, { bookType: 'xlsx', type: 'array' });
+  const archivo = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  saveAs(archivo, 'Detalle_Completo_Arboles.xlsx');
+};
+
+
 </script>
 
 <template>
@@ -168,6 +216,13 @@ const eliminarArbol = async (id) => {
             Siguiente
           </button>
         </div>
+        <!-- Botón de Exportar a Excel -->
+        <div class="flex justify-end mt-4">
+          <button @click="exportarExcel"
+            class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition">
+            Exportar a Excel
+          </button>
+        </div>
       </div>
     </div>
 
@@ -188,7 +243,8 @@ const eliminarArbol = async (id) => {
             <div class="space-y">
               <p><strong>Especie:</strong> {{ arbolSeleccionado.especie.nombre_comun }}</p>
               <p><strong>Municipio:</strong> {{ arbolSeleccionado.municipio.nombre }}</p>
-              <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{ arbolSeleccionado.longitud}}</p>
+              <p><strong>Coordenadas:</strong> Lat: {{ arbolSeleccionado.latitud }}, Long: {{
+                arbolSeleccionado.longitud }}</p>
               <p><strong>Dirección:</strong> {{ arbolSeleccionado.calle }} {{ arbolSeleccionado.numero_aprox }}</p>
               <p><strong>Identificación:</strong> {{ arbolSeleccionado.identificacion }}</p>
               <p><strong>Barrio:</strong> {{ arbolSeleccionado.barrio }}</p>
